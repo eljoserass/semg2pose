@@ -1,0 +1,21 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+
+# Data, checkpoints, outputs
+data/
+*.hdf5
+*.tar
+checkpoints/
+outputs/
+logs/
+wandb/
+lightning_logs/
+
+# Private documents (keep out of the public repo)
+*.pdf

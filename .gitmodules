@@ -1,0 +1,4 @@
+[submodule "emg2pose"]
+	path = emg2pose
+	url = https://github.com/eljoserass/emg2pose.git
+	branch = deprecating_conda
