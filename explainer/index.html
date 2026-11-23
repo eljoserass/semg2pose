@@ -1,0 +1,1290 @@
+<title>De la EMG a la mano</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky chapter rail on the left (desktop), one reading column with wider "lab" panels for each widget. */
+:root {
+  --bg: #F5F6FA; --surface: #FFFFFF; --surface-2: #EEF0F6; --ink: #141B2D; --ink-2: #4A5368; --ink-3: #6B7387;
+  --line: #DCE0EA; --accent: #3451D1; --accent-soft: #E5E9FB;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --grey: #9AA1B0;
+  --good: #1E7F4F; --good-bg: #E3F4EA; --bad: #B8342C; --bad-bg: #FBE7E5;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1320; --surface: #171C2B; --surface-2: #1E2436; --ink: #E9ECF4; --ink-2: #B3BACB; --ink-3: #8C94A8;
+  --line: #2B3248; --accent: #93A5FF; --accent-soft: #232B4D;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --grey: #6E768A;
+  --good: #58C892; --good-bg: #16322A; --bad: #FF8076; --bad-bg: #3A1D1D; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0F1320; --surface: #171C2B; --surface-2: #1E2436; --ink: #E9ECF4; --ink-2: #B3BACB; --ink-3: #8C94A8;
+  --line: #2B3248; --accent: #93A5FF; --accent-soft: #232B4D;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --grey: #6E768A;
+  --good: #58C892; --good-bg: #16322A; --bad: #FF8076; --bad-bg: #3A1D1D; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.6; }
+.wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 80px; }
+nav.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; max-height: calc(100vh - 48px); overflow: auto; font-size: 15px; }
+nav.rail .brand { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; margin-bottom: 6px; }
+nav.rail .score { font-size: 14px; color: var(--ink-3); margin-bottom: 16px; }
+nav.rail ol { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; counter-reset: ch -1; }
+nav.rail li { counter-increment: ch; }
+nav.rail a { display: flex; gap: 10px; padding: 5px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; line-height: 1.3; }
+nav.rail a::before { content: counter(ch); font-family: var(--mono); font-size: 12px; color: var(--ink-3); min-width: 18px; padding-top: 2px; }
+nav.rail a:hover, nav.rail a.on { background: var(--accent-soft); color: var(--ink); }
+main { min-width: 0; max-width: 820px; }
+section.ch { padding-block: 28px 40px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(36px, 5vw, 56px); font-weight: 800; letter-spacing: -0.5px; }
+h2 { font-size: clamp(28px, 3.4vw, 38px); font-weight: 700; margin-bottom: 14px; }
+h3 { font-size: 21px; font-weight: 700; margin: 26px 0 8px; }
+p { margin: 0 0 14px; max-width: 68ch; }
+.lede { font-size: 21px; color: var(--ink-2); max-width: 60ch; }
+b, strong { font-weight: 700; }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+a { color: var(--accent); }
+.math { font-family: var(--mono); font-size: 0.95em; background: var(--surface-2); padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+.callout { background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; margin: 18px 0; max-width: 68ch; }
+.callout p:last-child { margin: 0; }
+.note { font-size: 15px; color: var(--ink-3); }
+.journey { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 22px 0; padding: 0; list-style: none; }
+.journey li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 15px; line-height: 1.35; }
+.journey li b { display: block; font-family: var(--display); font-size: 17px; margin-bottom: 2px; }
+
+/* lab panels */
+.lab { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin: 20px 0; }
+.lab-title { font-family: var(--display); font-weight: 700; font-size: 17px; margin: 0 0 4px; display: flex; gap: 8px; align-items: baseline; }
+.lab-title::before { content: "Laboratorio"; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+.lab-sub { font-size: 15px; color: var(--ink-3); margin: 0 0 12px; max-width: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin: 10px 0; font-size: 15px; }
+.controls label { display: flex; gap: 10px; align-items: center; color: var(--ink-2); }
+.controls output, .readout b { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+input[type=range] { accent-color: var(--accent); width: 180px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 14px; padding: 6px 12px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.btn { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+.btn:hover { background: var(--accent-soft); }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.readout { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 15px; color: var(--ink-2); margin-top: 8px; }
+canvas, svg.chart { display: block; width: 100%; max-width: 100%; }
+svg.chart text { fill: var(--ink-3); font-family: var(--body); font-size: 12px; }
+svg.chart .axis { stroke: var(--line); }
+svg.chart .grid { stroke: var(--line); stroke-width: 1; opacity: 0.7; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--ink-2); margin: 6px 0; }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); vertical-align: middle; margin-right: 6px; }
+.legend span.dot::before { width: 10px; height: 10px; border-radius: 50%; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.two > * { min-width: 0; }
+figure { margin: 18px 0; }
+figure img { width: 100%; max-width: 560px; height: auto; display: block; border-radius: 10px; border: 1px solid var(--line); background: #FAFAF7; }
+figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
+.hand-frame { display: grid; grid-template-columns: 220px 1fr; gap: 18px; align-items: center; }
+.hand-frame img { width: 220px; height: auto; border-radius: 10px; background: #FBFAF6; border: 1px solid var(--line); }
+table.t { border-collapse: collapse; width: 100%; font-size: 15px; margin: 12px 0; }
+table.t th, table.t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t th { font-family: var(--display); font-weight: 700; color: var(--ink); }
+table.t td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tablewrap { overflow-x: auto; }
+
+/* quiz */
+.quiz { border: 1px dashed var(--accent); border-radius: 12px; padding: 14px 16px; margin: 22px 0; background: var(--surface); }
+.quiz .q { font-weight: 700; margin-bottom: 10px; }
+.quiz .q::before { content: "¿Lo pillaste? "; font-family: var(--mono); font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-right: 6px; }
+.quiz .opts { display: flex; flex-direction: column; gap: 6px; }
+.quiz button.opt { font: inherit; font-size: 16px; text-align: left; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; }
+.quiz button.opt:hover { border-color: var(--accent); }
+.quiz button.opt.right { background: var(--good-bg); border-color: var(--good); }
+.quiz button.opt.wrong { background: var(--bad-bg); border-color: var(--bad); }
+.quiz .fb { margin-top: 10px; font-size: 16px; }
+.quiz .fb .tag { font-weight: 700; }
+.quiz .fb .tag.ok { color: var(--good); }
+.quiz .fb .tag.no { color: var(--bad); }
+
+details.faq { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 8px 0; }
+details.faq summary { cursor: pointer; font-weight: 700; }
+details.faq p { margin: 10px 0 4px; }
+ul.reads { padding-left: 20px; }
+ul.reads li { margin-bottom: 8px; }
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 13px; padding: 6px 9px; border-radius: 6px; z-index: 20; max-width: 260px; line-height: 1.35; }
+
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  nav.rail { position: static; max-height: none; margin-bottom: 8px; }
+  nav.rail ol { flex-direction: row; overflow-x: auto; padding-bottom: 6px; }
+  nav.rail a { white-space: nowrap; }
+  .two, .hand-frame { grid-template-columns: minmax(0, 1fr); }
+  .hand-frame img { width: 100%; max-width: 280px; }
+  input[type=range] { width: 140px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+.info { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font-family: var(--mono); font-size: 12px; font-weight: 600; cursor: help; margin-left: -14px; flex: none; }
+.info:hover, .info:focus-visible { background: var(--accent); color: var(--surface); }
+:root[lang="en"] .lab-title::before { content: "Lab"; }
+:root[lang="fr"] .lab-title::before { content: "Labo"; }
+:root[lang="en"] .quiz .q::before { content: "Got it? "; }
+:root[lang="fr"] .quiz .q::before { content: "Compris ? "; }
+.seg.lang { margin: 4px 0 10px; }
+.seg.lang button { font-family: var(--mono); font-size: 12px; padding: 4px 10px; }
+</style>
+
+<div class="wrap">
+<nav class="rail" aria-label="Capítulos" data-i18n-attr="aria-label|nav.1@aria-label">
+  <div class="brand" data-i18n="nav.2">De la EMG a la mano</div>
+  <div class="seg lang" id="langSel" role="group" aria-label="Idioma / Language / Langue"><button type="button" data-v="es" aria-pressed="true" lang="es">ES</button><button type="button" data-v="en" aria-pressed="false" lang="en">EN</button><button type="button" data-v="fr" aria-pressed="false" lang="fr">FR</button></div>
+  <div class="score" id="score">Quiz: 0 / 0</div>
+  <ol id="toc">
+    <li data-i18n="nav.3"><a href="#inicio">La idea en 30 segundos</a></li>
+    <li data-i18n="nav.4"><a href="#motor">Del cerebro al electrodo</a></li>
+    <li data-i18n="nav.5"><a href="#bandas">Frecuencias y bandas</a></li>
+    <li data-i18n="nav.6"><a href="#anillo">El anillo de 16 electrodos</a></li>
+    <li data-i18n="nav.7"><a href="#derivadas">Posición, velocidad, aceleración</a></li>
+    <li data-i18n="nav.8"><a href="#tiempo">Correlacionar en el tiempo</a></li>
+    <li data-i18n="nav.9"><a href="#pca">PCA desde cero</a></li>
+    <li data-i18n="nav.10"><a href="#santello">¿Cuántas dimensiones? Santello</a></li>
+    <li data-i18n="nav.11"><a href="#r2">R² y lo que ve la EMG</a></li>
+    <li data-i18n="nav.12"><a href="#gratis">El bottleneck “gratis”</a></li>
+    <li data-i18n="nav.13"><a href="#tolerancia">Tolerancia</a></li>
+    <li data-i18n="nav.14"><a href="#usuarios">Generalizar a gente nueva</a></li>
+    <li data-i18n="nav.15"><a href="#metodos">PCA, autoencoder y otros</a></li>
+    <li data-i18n="nav.16"><a href="#faq">Tus preguntas</a></li>
+    <li data-i18n="nav.17"><a href="#lecturas">Para leer</a></li>
+  </ol>
+</nav>
+
+<main>
+<!-- 0 ---------------------------------------------------------------- -->
+<section class="ch" id="inicio">
+  <p class="eyebrow" data-i18n="inicio.1">semg2pose · guía desde cero</p>
+  <h1 data-i18n="inicio.2">De la EMG a la mano</h1>
+  <p class="lede" data-i18n="inicio.3">Todo lo que sacamos de los notebooks, explicado desde cero, con cosas que puedes tocar. Los datos de los laboratorios son reales: el usuario del dataset mini de emg2pose.</p>
+  <p data-i18n="inicio.4">Tu cerebro manda órdenes a los músculos del antebrazo, y esos músculos mueven los dedos a través de tendones. Una pulsera con <b>16 sensores</b> mide la electricidad de esos músculos: eso es la <b>EMG de superficie</b> (sEMG). Un modelo de Meta convierte esa señal en la postura de la mano, descrita con <b>20 ángulos</b> (cuánto se dobla cada articulación).</p>
+  <p data-i18n="inicio.5"><b>Nuestro proyecto:</b> los 20 ángulos se mueven muy coordinados, así que se pueden resumir con menos números. ¿Y si el modelo predice solo unos pocos números (un <b>latente</b> de tamaño <i>k</i>) y luego los traducimos a los 20 ángulos? ¿Funcionaría igual o mejor con personas que el modelo nunca vio? ¿Cuál es el <i>k</i> más pequeño que vale la pena?</p>
+  <ol class="journey">
+    <li data-i18n="inicio.6"><b>La señal</b>capítulos 1-3: qué mide un electrodo y dónde.</li>
+    <li data-i18n="inicio.7"><b>El movimiento</b>capítulos 4-5: derivadas, y cómo correlacionar en el tiempo.</li>
+    <li data-i18n="inicio.8"><b>Las dimensiones</b>capítulos 6-8: PCA, Santello, qué ve la EMG.</li>
+    <li data-i18n="inicio.9"><b>El plan</b>capítulos 9-12: bottleneck, tolerancia, cómo se valida.</li>
+  </ol>
+  <p class="note" data-i18n="inicio.10">Todo sale de 1 persona (dataset mini). Los números son orientativos; el método es lo que se lleva al dataset completo (193 personas).</p>
+</section>
+
+<!-- 1 ---------------------------------------------------------------- -->
+<section class="ch" id="motor">
+  <p class="eyebrow" data-i18n="motor.1">Capítulo 1</p>
+  <h2 data-i18n="motor.2">Del cerebro al electrodo</h2>
+  <p data-i18n="motor.3">Un músculo no recibe una sola orden. Está dividido en cientos de <b>motor units</b> (unidades motoras). Una motor unit es <b>una neurona motora</b> de la médula espinal más <b>todas las fibras musculares</b> que esa neurona controla.</p>
+  <p data-i18n="motor.4">Cuando la neurona dispara, todas sus fibras se contraen a la vez y producen una ondita eléctrica de unos milisegundos, el <b>MUAP</b>. La neurona solo sabe decir “disparo ahora”. El <b>mensaje</b> es <i>cuándo</i> dispara, como un código morse. La <b>forma</b> de la ondita no lleva mensaje: depende de lo grande que sea la unidad y de lo lejos que esté del sensor (es su firma).</p>
+  <p data-i18n="motor.5">Para hacer más fuerza, el sistema nervioso hace dos cosas: <b>enciende más motor units</b> y <b>las hace disparar más rápido</b>. El electrodo, desde la piel, oye la <b>suma</b> de todas las que tiene cerca. Por eso la EMG parece ruido.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="motor.6">Suma de motor units</p>
+    <p class="lab-sub" data-i18n="motor.7">Arriba: cuándo dispara cada unidad (una fila por unidad). Abajo: lo que ve el electrodo, la suma de todas sus onditas. Sube el número de unidades y mira cómo los picos sueltos se convierten en “ruido”.</p>
+    <div class="controls">
+      <label for="muN"><span class="lt" data-i18n="motor.8">Motor units</span><input id="muN" type="range" min="1" max="40" value="4"><output id="muNo">4</output></label>
+      <label for="muR"><span class="lt" data-i18n="motor.9">Ritmo de disparo</span><input id="muR" type="range" min="6" max="30" value="12"><output id="muRo">12 Hz</output></label>
+      <button class="btn" id="muPlay" type="button">Pausar</button>
+    </div>
+    <canvas id="muCanvas" height="300" aria-label="Animación: trenes de disparo de motor units y la señal suma en el electrodo" data-i18n-attr="aria-label|motor.10@aria-label"></canvas>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="q" data-i18n="motor.11">¿Qué información manda el sistema nervioso a través de una motor unit?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="motor.12">La forma de la ondita (MUAP)</button>
+      <button class="opt" type="button" data-i18n="motor.13">El momento de cada disparo</button>
+      <button class="opt" type="button" data-i18n="motor.14">Una frecuencia distinta para cada movimiento</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Eso. El mensaje es binario: cuándo dispara. La forma es la firma de la unidad (tamaño y distancia al sensor)." data-no="No. La forma depende de la anatomía (tamaño, profundidad). El mensaje es cuándo dispara la neurona." data-i18n-attr="data-ok|motor.15@data-ok,data-no|motor.16@data-no"></p>
+  </div>
+</section>
+
+<!-- 2 ---------------------------------------------------------------- -->
+<section class="ch" id="bandas">
+  <p class="eyebrow" data-i18n="bandas.1">Capítulo 2</p>
+  <h2 data-i18n="bandas.2">Frecuencias y bandas: qué nos dan y qué no</h2>
+  <p data-i18n="bandas.3">La <b>frecuencia</b> es cuántas veces por segundo sube y baja una señal. Cualquier señal se puede escribir como una suma de ondas de distintas frecuencias (eso es la transformada de Fourier). El <b>espectro</b> dice cuánta energía hay en cada frecuencia. Una <b>banda</b> es un rango, por ejemplo 120-250 Hz.</p>
+  <p data-i18n="bandas.4">Regla clave: una ondita <b>estrecha</b> (rápida) tiene energía en frecuencias <b>altas</b>; una <b>ancha</b>, en frecuencias <b>bajas</b>. La piel y la grasa emborronan las onditas que vienen de lejos: las ensanchan. Así que una motor unit <b>profunda</b> manda su energía a las bandas bajas.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="bandas.5">Profundidad de una motor unit</p>
+    <p class="lab-sub" data-i18n="bandas.6">Gris: una unidad pegada al sensor (2 mm). Color: la que tú mueves. Izquierda, la forma del MUAP (escalada a la misma altura para comparar la anchura); derecha, qué porcentaje de su energía cae en cada banda.</p>
+    <div class="controls">
+      <label for="depth"><span class="lt" data-i18n="bandas.7">Profundidad</span><input id="depth" type="range" min="1" max="15" value="8" step="0.5"><output id="deptho">8 mm</output></label>
+    </div>
+    <div class="two">
+      <svg class="chart" id="muapSvg" viewBox="0 0 380 220" role="img" aria-label="Forma del MUAP de una unidad cercana y de una profunda" data-i18n-attr="aria-label|bandas.8@aria-label"></svg>
+      <svg class="chart" id="bandSvg" viewBox="0 0 380 220" role="img" aria-label="Porcentaje de energía por banda para cada unidad" data-i18n-attr="aria-label|bandas.9@aria-label"></svg>
+    </div>
+    <div class="readout" id="bandRead"></div>
+  </div>
+  <p data-i18n="bandas.10"><b>Conclusión:</b> cada motor unit reparte su energía por <b>todas</b> las bandas. Una banda no es “un grupo de motor units”. Lo que hace una banda alta es dar <b>más peso a las unidades cercanas</b> al sensor. En los datos reales lo vimos así: en bandas altas, los electrodos separados se parecen menos entre sí (son más “locales”).</p>
+  <h3 data-i18n="bandas.11">¿Meta pasa la señal a frecuencia antes del modelo?</h3>
+  <p data-i18n="bandas.12"><b>No.</b> A la red le entra el <b>voltaje crudo</b> de los 16 canales (solo con un filtro que quita lo que está por debajo de 40 Hz y un escalado). La primera capa es una <b>convolución</b>: 256 filtros pequeñitos, cada uno mira 16 canales × 5,5 ms, y sus pesos se aprenden solos durante el entrenamiento.</p>
+  <p data-i18n="bandas.13">Lo que hicimos nosotros fue <b>abrir el modelo ya entrenado</b> y calcular la FFT de esos 256 filtros para ver qué frecuencias dejan pasar. Resultado: son <b>filtros pasa-banda entre ~80 y 400 Hz</b>, y cada uno combina unos <b>4 electrodos vecinos con signos opuestos</b> (resta un vecino a otro, como un electrodo diferencial). Es decir, la red aprendió sola a hacer “zoom” en las unidades cercanas.</p>
+  <figure><img src="figs/filters.png" alt="Respuesta en frecuencia de los 256 filtros de la primera capa de vemg2pose, ordenados: todos son pasa-banda entre unos 80 y 400 Hz" loading="lazy" width="1203" height="907" data-i18n-attr="alt|bandas.14@alt"><figcaption data-i18n="bandas.15">Cada fila es un filtro de la primera capa (ordenados). Oscuro = deja pasar. Nada por encima de ~500 Hz.</figcaption></figure>
+  <div class="quiz" data-answer="0">
+    <p class="q" data-i18n="bandas.16">Si una motor unit está más profunda, su energía se va sobre todo a…</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="bandas.17">Frecuencias más bajas</button>
+      <button class="opt" type="button" data-i18n="bandas.18">Frecuencias más altas</button>
+      <button class="opt" type="button" data-i18n="bandas.19">Una sola banda propia</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Correcto. El tejido ensancha la ondita y eso la manda a frecuencias bajas." data-no="Al revés: el tejido ensancha la ondita, y una onda ancha vive en frecuencias bajas." data-i18n-attr="data-ok|bandas.20@data-ok,data-no|bandas.21@data-no"></p>
+  </div>
+</section>
+
+<!-- 3 ---------------------------------------------------------------- -->
+<section class="ch" id="anillo">
+  <p class="eyebrow" data-i18n="anillo.1">Capítulo 3</p>
+  <h2 data-i18n="anillo.2">El anillo de 16 electrodos</h2>
+  <p data-i18n="anillo.3">La pulsera es un anillo de 16 sensores alrededor de la muñeca, a ~1 cm uno de otro. El paper de emg2pose dice que hay un hueco entre el 15 y el 0 en el lado del meñique (junto al hueso que sobresale). Con nuestros datos vimos que los canales que más se activan al cerrar la mano están alrededor del 3: así que <b>0-7 van por la palma</b> (músculos flexores, que cierran) y <b>8-15 por el dorso</b> (extensores, que abren).</p>
+  <p data-i18n="anillo.4">Un detalle importante: casi cualquier movimiento enciende <b>casi todos</b> los electrodos (los músculos se co-activan para dar rigidez). Ese componente común lo llamamos “esfuerzo”. Si se lo quitamos a cada movimiento, aparece <b>dónde</b> se activa más.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="anillo.5">Mapa de cada dedo en la muñeca</p>
+    <p class="lab-sub" data-i18n="anillo.6">Datos reales (banda 120-250 Hz, 60 ms antes del movimiento, comparado con reposo). Elige dedo y dirección. Pasa el ratón por un electrodo para ver su valor.</p>
+    <div class="controls">
+      <div class="seg" id="topoFinger" role="group" aria-label="Dedo" data-i18n-attr="aria-label|anillo.7@aria-label"></div>
+      <div class="seg" id="topoDir" role="group" aria-label="Dirección" data-i18n-attr="aria-label|anillo.8@aria-label">
+        <button type="button" data-v="flex" aria-pressed="true" data-i18n="anillo.9">flexionar</button>
+        <button type="button" data-v="ext" aria-pressed="false" data-i18n="anillo.10">extender</button>
+      </div>
+      <label for="topoCommon"><input id="topoCommon" type="checkbox" checked=""> <span class="lt" data-i18n="anillo.11">quitar el esfuerzo común</span></label>
+      <span class="info" tabindex="0" role="note" aria-label="Qué hace esta opción" data-tip="Casi cualquier movimiento activa los 16 electrodos a la vez (los músculos se co-activan para dar rigidez): eso es el “esfuerzo común”. Marcado: a cada electrodo le restamos la media de los 16, y se ve dónde se activa MÁS que el resto. Sin marcar: ves la actividad total respecto al reposo, casi todo encendido." data-i18n-attr="aria-label|anillo.12@aria-label,data-tip|anillo.13@data-tip">i</span>
+    </div>
+    <svg class="chart" id="topoSvg" viewBox="0 0 660 380" role="img" aria-label="Corte de la muñeca con los 16 electrodos coloreados según su actividad" data-i18n-attr="aria-label|anillo.14@aria-label"></svg>
+    <div class="readout" id="topoRead"></div>
+  </div>
+  <p data-i18n="anillo.15">Lo que se ve: flexionar el índice enciende la palma, extenderlo enciende el dorso; el pulgar tira hacia el lado del pulgar (radial); el meñique, hacia el borde del meñique (canal 0). Coincide con los músculos que hay debajo de cada sensor.</p>
+  <h3 data-i18n="anillo.16">¿Las bandas ayudan a saber qué movimiento es?</h3>
+  <p data-i18n="anillo.17">Probamos a adivinar el movimiento con un clasificador sencillo. La comparación justa importa: con más números de entrada casi siempre se acierta más, sean lo que sean. Así que comparamos <b>el mismo número de entradas</b>:</p>
+  <div class="tablewrap"><table class="t">
+    <tbody><tr><th data-i18n="anillo.18">Entradas (todas son 80 números)</th><th data-i18n="anillo.19">Qué tienen</th><th data-i18n="anillo.20">Adivinar la tarea</th><th data-i18n="anillo.21">Adivinar dedo y dirección</th></tr>
+    <tr><td data-i18n="anillo.22">16 electrodos × 5 bandas</td><td data-i18n="anillo.23">dónde + qué banda</td><td class="n" data-i18n="anillo.24">0,51</td><td class="n" data-i18n="anillo.25">0,31</td></tr>
+    <tr><td data-i18n="anillo.26">16 electrodos × 5 instantes (ahora, −0,1 s… −0,4 s)</td><td data-i18n="anillo.27">dónde + historia reciente</td><td class="n" data-i18n="anillo.28">0,50</td><td class="n" data-i18n="anillo.29">0,38</td></tr>
+  </tbody></table></div>
+  <p data-i18n="anillo.30">Las bandas añaden información respecto a usar solo “dónde” (16 números: 0,31 y 0,24), pero <b>no más que gastar esos mismos números en historia temporal</b>. Las bandas son útiles, no especiales. (Azar: 0,07 y 0,09.)</p>
+  <div class="quiz" data-answer="1">
+    <p class="q" data-i18n="anillo.31">Al extender el índice, ¿dónde esperas más actividad?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="anillo.32">En la palma (canales 0-7)</button>
+      <button class="opt" type="button" data-i18n="anillo.33">En el dorso (canales 8-15)</button>
+      <button class="opt" type="button" data-i18n="anillo.34">Igual en todos</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Sí. Los extensores están en el dorso del antebrazo." data-no="Los músculos solo tiran: para extender trabajan los extensores, que están en el dorso." data-i18n-attr="data-ok|anillo.35@data-ok,data-no|anillo.36@data-no"></p>
+  </div>
+</section>
+
+<!-- 4 ---------------------------------------------------------------- -->
+<section class="ch" id="derivadas">
+  <p class="eyebrow" data-i18n="derivadas.1">Capítulo 4</p>
+  <h2 data-i18n="derivadas.2">Posición, velocidad, aceleración</h2>
+  <p data-i18n="derivadas.3"><b>Posición</b>: dónde está el dedo (el ángulo, en grados). <b>Velocidad</b>: cuánto cambia la posición por segundo. Gráficamente es la <b>pendiente</b> de la curva de posición: eso es la <b>derivada</b>. <b>Aceleración</b>: cuánto cambia la velocidad (la derivada de la derivada).</p>
+  <p data-i18n="derivadas.4">La <b>integral</b> es lo contrario: si sabes la velocidad en cada instante y <b>dónde empezaste</b>, sumas todos los pequeños cambios y sabes dónde estás. Gráficamente es el <b>área</b> bajo la curva de velocidad.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="derivadas.5">Derivar e integrar un dedo</p>
+    <p class="lab-sub" data-i18n="derivadas.6">Un dedo que se cierra, se abre y hace un golpe rápido. Mueve el instante: la recta roja es la pendiente (velocidad); el área sombreada bajo la velocidad es cuánto ha cambiado la posición desde el principio.</p>
+    <div class="controls"><label for="dT"><span class="lt" data-i18n="derivadas.7">Instante</span><input id="dT" type="range" min="0" max="599" value="150"><output id="dTo">1,5 s</output></label></div>
+    <canvas id="derivCanvas" height="420" aria-label="Posición, velocidad y actividad de flexores y extensores de un dedo simulado" data-i18n-attr="aria-label|derivadas.8@aria-label"></canvas>
+    <div class="readout" id="derivRead"></div>
+  </div>
+  <h3 data-i18n="derivadas.9">¿Y la EMG qué mide de todo esto?</h3>
+  <p data-i18n="derivadas.10">La física de la articulación, en una línea: <span class="math">fuerza ≈ I·aceleración + B·velocidad + K·(posición − reposo)</span>. Mover deprisa necesita fuerza (B), sostener el dedo lejos de su postura de reposo también (K), y arrancar o frenar de golpe un poco más (I). Además, <b>los músculos solo tiran</b>: los flexores trabajan cuando el dedo se dobla y los extensores cuando se estira. Por eso, en el laboratorio de arriba, la actividad de cada músculo es la parte positiva o negativa de la velocidad, más un poco de posición.</p>
+  <p data-i18n="derivadas.11">Lo comprobamos con <b>modelos lineales nuestros</b> (no el modelo de Meta): predecir la envolvente de cada electrodo a partir del movimiento. R² = qué parte de la variación de la EMG se explica (capítulo 8 lo explica desde cero).</p>
+  <div class="tablewrap"><table class="t">
+    <tbody><tr><th data-i18n="derivadas.12">Qué le damos al modelo</th><th data-i18n="derivadas.13">R² medio</th></tr>
+    <tr><td data-i18n="derivadas.14">posición</td><td class="n" data-i18n="derivadas.15">0,07</td></tr>
+    <tr><td data-i18n="derivadas.16">velocidad con signo (un número por PC)</td><td class="n" data-i18n="derivadas.17">0,05</td></tr>
+    <tr><td data-i18n="derivadas.18"><b>velocidad separada por dirección</b> (cuánto flexiona, cuánto extiende)</td><td class="n" data-i18n="derivadas.19"><b>0,14</b></td></tr>
+    <tr><td data-i18n="derivadas.20">posición + velocidad separada</td><td class="n" data-i18n="derivadas.21">0,20</td></tr>
+    <tr><td data-i18n="derivadas.22">+ aceleración separada</td><td class="n" data-i18n="derivadas.23">0,22</td></tr>
+  </tbody></table></div>
+  <p data-i18n="derivadas.24">Así que tu intuición era buena a medias: la EMG lleva <b>las dos cosas</b>, y la parte más grande es la <b>velocidad separada por dirección</b>. Mirando electrodo por electrodo, los del <b>dorso</b> (8-14) llevan tanta información de posición como de velocidad, y los de la <b>palma</b> (3-7) casi solo de movimiento. Esto sale de nuestro análisis con 1 persona, no de la literatura: es una hipótesis (una explicación posible: los extensores trabajan de forma sostenida para mantener los dedos abiertos).</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="derivadas.25">Tracking contra regresión</p>
+    <p class="lab-sub" data-i18n="derivadas.26">El modelo “tracking” de Meta conoce la postura inicial y suma (integra) las velocidades que predice. El de “regresión” no la conoce. Aquí las velocidades predichas tienen un poco de ruido.</p>
+    <div class="controls"><button class="btn" id="trkNew" type="button" data-i18n="derivadas.27">Otro intento</button><div class="seg" id="trkMode" role="group" aria-label="Postura inicial" data-i18n-attr="aria-label|derivadas.28@aria-label"><button type="button" data-v="known" aria-pressed="true" data-i18n="derivadas.29">conozco el inicio</button><button type="button" data-v="unknown" aria-pressed="false" data-i18n="derivadas.30">no lo conozco</button></div></div>
+    <svg class="chart" id="trkSvg" viewBox="0 0 760 240" role="img" aria-label="Posición real contra posición obtenida integrando velocidades ruidosas" data-i18n-attr="aria-label|derivadas.31@aria-label"></svg>
+    <div class="legend"><span style="--c:var(--ink)" data-i18n="derivadas.32">posición real</span><span style="--c:var(--s1)" data-i18n="derivadas.33">integrando velocidades predichas</span></div>
+    <div class="readout" id="trkRead"></div>
+  </div>
+  <p data-i18n="derivadas.34">Integrar velocidades funciona bien si conoces el inicio, aunque el error se va acumulando (por eso el benchmark reinicia cada ventana de 5 s). Sin inicio, todo queda desplazado. En los datos reales: tracking <b>9,2°</b> de error medio, regresión <b>13,0°</b>. Detalle técnico: el modelo de “regresión” de Meta también integra velocidades a partir de 250 ms; lo que le falta es la postura inicial.</p>
+  <div class="quiz" data-answer="2">
+    <p class="q" data-i18n="derivadas.35">Conoces la velocidad del dedo en cada instante y su posición inicial. ¿Cómo obtienes la posición?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="derivadas.36">Derivando la velocidad</button>
+      <button class="opt" type="button" data-i18n="derivadas.37">No se puede</button>
+      <button class="opt" type="button" data-i18n="derivadas.38">Integrando (sumando) la velocidad desde la posición inicial</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Exacto. Eso es lo que hace el modelo tracking." data-no="Derivar la velocidad da la aceleración. Para volver a la posición hay que integrar (sumar los cambios) desde el inicio." data-i18n-attr="data-ok|derivadas.39@data-ok,data-no|derivadas.40@data-no"></p>
+  </div>
+</section>
+
+<!-- 5 ---------------------------------------------------------------- -->
+<section class="ch" id="tiempo">
+  <p class="eyebrow" data-i18n="tiempo.1">Capítulo 5</p>
+  <h2 data-i18n="tiempo.2">Correlacionar señales en el tiempo</h2>
+  <p data-i18n="tiempo.3">La <b>correlación</b> (r) mide cuánto suben y bajan juntas dos señales: 1 = siempre juntas, 0 = nada que ver, −1 = una sube cuando la otra baja. Problema: la orden eléctrica llega al músculo <b>antes</b> de que el dedo se mueva. Si comparas los dos en el mismo instante, subestimas la relación.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="tiempo.4">Retardo entre EMG y movimiento</p>
+    <p class="lab-sub" data-i18n="tiempo.5">Datos reales: actividad media de los 16 electrodos (azul) y velocidad de la mano (naranja), 40 s de abrir y cerrar. Desplaza la EMG y mira cuándo se alinean mejor.</p>
+    <div class="controls"><label for="lagS"><span class="lt" data-i18n="tiempo.6">Retardo</span><input id="lagS" type="range" min="-200" max="300" step="20" value="0"><output id="lagSo">0 ms</output></label></div>
+    <svg class="chart" id="lagSvg" viewBox="0 0 760 210" role="img" aria-label="Envolvente de la EMG y velocidad de la mano a lo largo del tiempo" data-i18n-attr="aria-label|tiempo.7@aria-label"></svg>
+    <div class="legend"><span style="--c:var(--s1)" data-i18n="tiempo.8">actividad EMG (desplazada)</span><span style="--c:var(--s2)" data-i18n="tiempo.9">velocidad de la mano</span></div>
+    <svg class="chart" id="lagCurve" viewBox="0 0 760 170" role="img" aria-label="Correlación en función del retardo" data-i18n-attr="aria-label|tiempo.10@aria-label"></svg>
+    <div class="readout" id="lagRead"></div>
+  </div>
+  <p data-i18n="tiempo.11">El máximo está en <b>~40-60 ms</b>: la EMG va por delante del movimiento. Es el <b>retardo electromecánico</b>, y sale igual en los 16 canales.</p>
+  <h3 data-i18n="tiempo.12">Muchos canales × muchos ángulos × tiempo</h3>
+  <p data-i18n="tiempo.13">Hay 16 × 20 = 320 parejas canal-ángulo, y cada una por separado correlaciona poco (como mucho r ≈ 0,26), porque la información está repartida por el anillo. Los métodos que funcionan juntan todo:</p>
+  <ol>
+    <li data-i18n="tiempo.14"><b>Resumir los ángulos</b> en unas pocas componentes (PCs, capítulo 6). En vez de 20 objetivos, 3-8.</li>
+    <li data-i18n="tiempo.15"><b>Regresión con retardos</b> (en EEG se llama <i>mTRF</i>): usar los últimos 300 ms de los 16 canales para predecir cada PC. Los pesos te dicen <i>qué electrodo</i> y <i>cuánto antes</i>.</li>
+    <li data-i18n="tiempo.16"><b>Coherencia</b>: una correlación calculada por separado en cada frecuencia del movimiento. Sale acoplamiento solo por debajo de ~5 Hz, y los 16 canales juntos explican 2-3 veces más que el mejor canal solo.</li>
+    <li data-i18n="tiempo.17"><b>CCA</b>: busca la mezcla de canales y la mezcla de ángulos que más se parecen entre sí.</li>
+  </ol>
+  <h3 data-i18n="tiempo.18">El “filtro temporal”: derivadas e integrales dentro del decodificador</h3>
+  <p data-i18n="tiempo.19">El “filtro temporal” son los <b>pesos de nuestra regresión con retardos</b> (punto 2), no algo de Meta. Para un electrodo, el modelo da un peso a cada instante pasado.</p>
+  <figure><img src="figs/trf.png" alt="Pesos del decodificador lineal para el canal 13 a lo largo de los últimos 300 ms: para velocidad cambian de signo, para posición tienen siempre el mismo signo" loading="lazy" width="1747" height="846" data-i18n-attr="alt|tiempo.20@alt"><figcaption data-i18n="tiempo.21">Canal 13. Izquierda: para predecir velocidad. Derecha: para predecir posición.</figcaption></figure>
+  <p data-i18n="tiempo.22">Para <b>velocidad</b>, el peso de hace 220-300 ms es positivo y el de hace 100 ms es negativo: el modelo calcula <i>actividad antigua menos actividad reciente</i>. Restar un valor de antes y uno de ahora es justo una <b>derivada</b>. Para <b>posición</b>, todos los pesos tienen el mismo signo: el modelo <b>suma</b> la actividad de los últimos 300 ms, que es una <b>integral</b>. El signo concreto no importa (depende de cómo esté orientada la PC); lo que importa es “cambia de signo” contra “no cambia”.</p>
+  <div class="quiz" data-answer="0">
+    <p class="q" data-i18n="tiempo.23">¿Por qué la correlación es máxima con la EMG desplazada ~60 ms?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="tiempo.24">Porque la activación eléctrica del músculo ocurre antes que el movimiento</button>
+      <button class="opt" type="button" data-i18n="tiempo.25">Porque el sensor de movimiento va retrasado</button>
+      <button class="opt" type="button" data-i18n="tiempo.26">Por casualidad</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Eso: primero la señal eléctrica, luego la fuerza, luego el movimiento." data-no="Es fisiología: el músculo se activa eléctricamente, genera fuerza y solo después se mueve el dedo. Sale igual en los 16 canales." data-i18n-attr="data-ok|tiempo.27@data-ok,data-no|tiempo.28@data-no"></p>
+  </div>
+</section>
+
+<!-- 6 ---------------------------------------------------------------- -->
+<section class="ch" id="pca">
+  <p class="eyebrow" data-i18n="pca.1">Capítulo 6</p>
+  <h2 data-i18n="pca.2">PCA desde cero</h2>
+  <p data-i18n="pca.3">Coge dos articulaciones que se mueven casi juntas: el nudillo del dedo corazón y el del anular. Si dibujas cada instante como un punto (ángulo de uno contra el otro), la nube queda alargada, casi una línea. Entonces <b>un solo número</b> (dónde cae el punto a lo largo de esa línea) resume casi todo.</p>
+  <p data-i18n="pca.4"><b>PCA</b> busca esa dirección automáticamente: la que tiene más dispersión (varianza). Esa es la <b>PC1</b>. La PC2 es la siguiente mejor dirección, perpendicular a la primera, y así sucesivamente.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="pca.5">Encuentra la PC1</p>
+    <p class="lab-sub" data-i18n="pca.6">Datos reales (700 instantes). Gira la línea: cada punto se proyecta sobre ella (su “sombra”). El porcentaje es cuánta varianza captura esa dirección.</p>
+    <div class="controls">
+      <div class="seg" id="pcaPair" role="group" aria-label="Pareja de articulaciones" data-i18n-attr="aria-label|pca.7@aria-label"></div>
+      <label for="pcaAng"><span class="lt" data-i18n="pca.8">Dirección</span><input id="pcaAng" type="range" min="0" max="179" value="120"><output id="pcaAngo">120°</output></label>
+      <button class="btn" id="pcaBest" type="button" data-i18n="pca.9">Buscar la mejor</button>
+    </div>
+    <canvas id="pcaCanvas" height="380" aria-label="Nube de puntos de dos ángulos con una línea que se puede girar" data-i18n-attr="aria-label|pca.10@aria-label"></canvas>
+    <div class="readout" id="pcaRead"></div>
+  </div>
+  <p data-i18n="pca.11">Con los 20 ángulos es la misma idea en 20 dimensiones (no se puede dibujar, pero las cuentas son iguales). La <b>PC1 es una dirección fija</b>: 20 pesos, uno por articulación. Y la PC1 <b>de un instante</b> es <b>un número real y ya</b>: cuánto se ha ido la mano en esa dirección. Para nuestra persona, la PC1 es “abrir ↔ cerrar los cuatro dedos” y explica el 53 % de toda la variación.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="pca.12">Mover un solo número</p>
+    <p class="lab-sub" data-i18n="pca.13">Partimos de la postura media y movemos una PC entre −2 y +2 desviaciones típicas. Las demás quedan quietas.</p>
+    <div class="controls">
+      <div class="seg" id="handPc" role="group" aria-label="Componente" data-i18n-attr="aria-label|pca.14@aria-label">
+        <button type="button" data-v="pc1" aria-pressed="true" data-i18n="pca.15">PC1 (53 %)</button>
+        <button type="button" data-v="pc3" aria-pressed="false" data-i18n="pca.16">PC3 (7 %)</button>
+        <button type="button" data-v="pc4" aria-pressed="false" data-i18n="pca.17">PC4 (5 %)</button>
+      </div>
+      <label for="handS"><span class="lt" data-i18n="pca.18">Valor</span><input id="handS" type="range" min="0" max="8" value="4"><output id="handSo">0 σ</output></label>
+    </div>
+    <div class="hand-frame">
+      <img id="handImg" src="hands/pc1_4.png" alt="Mano en la postura media" width="202" height="156" data-i18n-attr="alt|pca.19@alt">
+      <p class="note" id="handTxt">PC1: abrir y cerrar los cuatro dedos a la vez. Es la “sinergia” clásica.</p>
+    </div>
+  </div>
+  <div class="quiz" data-answer="1">
+    <p class="q" data-i18n="pca.20">En un instante concreto, ¿qué es “la PC1” de la postura?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="pca.21">Un vector de 20 ángulos</button>
+      <button class="opt" type="button" data-i18n="pca.22">Un número: cuánto está la mano a lo largo de la dirección PC1</button>
+      <button class="opt" type="button" data-i18n="pca.23">El ángulo de la articulación más importante</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Exacto. La dirección (los 20 pesos) es fija; en cada instante la PC1 es un solo número." data-no="La dirección es un vector de 20 pesos, fijo. Pero la PC1 de un instante es un número: la proyección de la postura sobre esa dirección." data-i18n-attr="data-ok|pca.24@data-ok,data-no|pca.25@data-no"></p>
+  </div>
+</section>
+
+<!-- 7 ---------------------------------------------------------------- -->
+<section class="ch" id="santello">
+  <p class="eyebrow" data-i18n="santello.1">Capítulo 7</p>
+  <h2 data-i18n="santello.2">¿Cuántas dimensiones necesita la mano? (Santello)</h2>
+  <p data-i18n="santello.3">En 1998, Santello y colegas pidieron a 5 personas que <b>imaginaran agarrar 57 objetos</b> (un huevo, un martillo, un CD…) y mantuvieran la postura final. Un guante midió <b>15 ángulos</b>. Con PCA, <b>2 componentes explicaban más del 80 %</b> de la variación. Conclusión famosa: al agarrar, la mano funciona como si tuviera muy pocas dimensiones (“sinergias”).</p>
+  <p data-i18n="santello.4">Nuestra pregunta: ¿sale lo mismo en emg2pose? Lo reproducimos paso a paso, acercando nuestros datos a sus condiciones.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="santello.5">Reproducir a Santello</p>
+    <p class="lab-sub" data-i18n="santello.6">Curva: porcentaje de variación explicado con 1, 2, 3… componentes. La estrella es el resultado de Santello.</p>
+    <div class="controls">
+      <div class="seg" id="sanFrames" role="group" aria-label="Qué instantes" data-i18n-attr="aria-label|santello.7@aria-label"><button type="button" data-v="all" aria-pressed="true" data-i18n="santello.8">todo el movimiento</button><button type="button" data-v="held" aria-pressed="false" data-i18n="santello.9">solo posturas quietas</button></div>
+      <div class="seg" id="sanAngles" role="group" aria-label="Qué ángulos" data-i18n-attr="aria-label|santello.10@aria-label"><button type="button" data-v="20" aria-pressed="true" data-i18n="santello.11">20 ángulos</button><button type="button" data-v="15" aria-pressed="false" data-i18n="santello.12">15 de Santello</button></div>
+    </div>
+    <svg class="chart" id="sanSvg" viewBox="0 0 760 300" role="img" aria-label="Varianza acumulada según el número de componentes" data-i18n-attr="aria-label|santello.13@aria-label"></svg>
+    <div class="readout" id="sanRead"></div>
+  </div>
+  <p data-i18n="santello.14">Con <b>posturas quietas</b> (55, casi como sus 57) y <b>sus 15 ángulos</b>, PC1 + PC2 = 80,5 %: lo reproducimos. Con todo el movimiento y los 20 ángulos baja a 65,5 %, porque emg2pose también tiene las <b>transiciones</b> entre posturas y movimientos de <b>dedos sueltos</b> (contar, señalar, pinzas), que añaden dimensiones.</p>
+  <h3 data-i18n="santello.15">La escalera de dimensiones</h3>
+  <div class="tablewrap"><table class="t">
+    <tbody><tr><th data-i18n="santello.16">Nivel</th><th data-i18n="santello.17">Dimensiones</th></tr>
+    <tr><td data-i18n="santello.18">grados de libertad anatómicos de la mano (con muñeca)</td><td class="n" data-i18n="santello.19">~27</td></tr>
+    <tr><td data-i18n="santello.20">ángulos que registra emg2pose</td><td class="n" data-i18n="santello.21">20</td></tr>
+    <tr><td data-i18n="santello.22">PCs para el 90 % de la variación</td><td class="n" data-i18n="santello.23">8</td></tr>
+    <tr><td data-i18n="santello.24">dimensión intrínseca (TwoNN, escala gruesa)</td><td class="n" data-i18n="santello.25">8-9</td></tr>
+    <tr><td data-i18n="santello.26">sinergias musculares para el 90 % de la EMG</td><td class="n" data-i18n="santello.27">5</td></tr>
+    <tr><td data-i18n="santello.28">dimensión “efectiva” (participation ratio)</td><td class="n" data-i18n="santello.29">3,2</td></tr>
+    <tr><td data-i18n="santello.30">PCs que el modelo de regresión de Meta predice con R² &gt; 0,1</td><td class="n" data-i18n="santello.31">4</td></tr>
+  </tbody></table></div>
+  <div class="quiz" data-answer="2">
+    <p class="q" data-i18n="santello.32">¿Por qué en emg2pose hacen falta más componentes que en Santello?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="santello.33">Porque la pulsera mide peor</button>
+      <button class="opt" type="button" data-i18n="santello.34">Porque Santello se equivocó</button>
+      <button class="opt" type="button" data-i18n="santello.35">Porque incluye movimientos entre posturas y de dedos sueltos, no solo agarres quietos</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Sí. Con sus condiciones (posturas quietas, sus 15 ángulos) sale su número." data-no="Con sus mismas condiciones sale su 80 %. La diferencia está en qué movimientos se miden." data-i18n-attr="data-ok|santello.36@data-ok,data-no|santello.37@data-no"></p>
+  </div>
+</section>
+
+<!-- 8 ---------------------------------------------------------------- -->
+<section class="ch" id="r2">
+  <p class="eyebrow" data-i18n="r2.1">Capítulo 8</p>
+  <h2 data-i18n="r2.2">R² y lo que la EMG deja ver</h2>
+  <p data-i18n="r2.3"><b>R²</b> responde: ¿qué parte de la variación de una señal acierta mi predicción? R² = 1 es perfecto. R² = 0 es lo mismo que predecir siempre la media (no sabes nada). Y puede ser <b>negativo</b>: tu predicción es <b>peor que predecir la media</b>, porque añade errores.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="r2.4">Juega con R²</p>
+    <p class="lab-sub" data-i18n="r2.5">Compara la señal real con la predicción y prueba los botones.</p>
+    <div class="legend"><span style="--c:var(--ink)" data-i18n="r2.6">señal real</span><span style="--c:var(--s1)" data-i18n="r2.7">predicción</span><span style="--c:var(--grey)" data-i18n="r2.8">media de la señal</span></div>
+    <div class="controls">
+      <label for="r2q"><span class="lt" data-i18n="r2.9">Calidad</span><input id="r2q" type="range" min="0" max="100" value="70"><output id="r2qo">70 %</output></label>
+      <label for="r2n"><span class="lt" data-i18n="r2.10">Ruido inventado</span><input id="r2n" type="range" min="0" max="100" value="20"><output id="r2no">20 %</output></label>
+      <button class="btn" type="button" data-preset="perfect" data-i18n="r2.11">perfecta</button>
+      <button class="btn" type="button" data-preset="mean" data-i18n="r2.12">predecir la media</button>
+      <button class="btn" type="button" data-preset="worse" data-i18n="r2.13">peor que la media</button>
+    </div>
+    <svg class="chart" id="r2Svg" viewBox="0 0 760 200" role="img" aria-label="Señal real y predicción" data-i18n-attr="aria-label|r2.14@aria-label"></svg>
+    <div class="readout" id="r2Read"></div>
+  </div>
+  <h3 data-i18n="r2.15">¿Qué partes de la pose recupera el modelo de Meta en una persona nueva?</h3>
+  <p data-i18n="r2.16">Pasamos las predicciones del modelo preentrenado a coordenadas PCA y calculamos R² en cada componente.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="r2.17">R² por componente</p>
+    <p class="lab-sub" data-i18n="r2.18">Debajo de cada barra, cuánta variación de la pose tiene esa PC. Barras por debajo de −0,6 recortadas. Pasa el ratón para ver el valor.</p>
+    <div class="legend"><span class="dot" style="--c:var(--s1)" data-i18n="r2.19">tracking (conoce el inicio)</span><span class="dot" style="--c:var(--s2)" data-i18n="r2.20">regresión (solo EMG)</span></div>
+    <svg class="chart" id="pcSvg" viewBox="0 0 760 280" role="img" aria-label="R² por componente principal para tracking y regresión" data-i18n-attr="aria-label|r2.21@aria-label"></svg>
+  </div>
+  <p data-i18n="r2.22"><b>“¿Quizás no hay mucho que reducir?”</b> Hay dos números distintos. Para <b>describir</b> la pose hacen falta ~8 dimensiones. Pero lo que el modelo <b>acierta</b> en una persona nueva es mucho menos: en regresión, la PC1 muy bien (0,79), otra PC grande a medias, un par muy flojo, y a partir de la PC10 R² negativo. Así que sí hay qué reducir: no la mano en sí, sino <b>las direcciones que la EMG no deja predecir</b>. Ahí el modelo solo mete error.</p>
+  <div class="quiz" data-answer="1">
+    <p class="q" data-i18n="r2.23">El modelo tiene R² = −0,8 en la PC11. ¿Qué significa?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="r2.24">Que acierta un 80 % al revés</button>
+      <button class="opt" type="button" data-i18n="r2.25">Que predecir esa PC empeora las cosas: mejor predecir su media</button>
+      <button class="opt" type="button" data-i18n="r2.26">Que esa PC no existe</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Eso. Si la quitáramos (o la fijáramos a la media), el error bajaría." data-no="R² negativo = la predicción es peor que predecir siempre la media. Esa componente solo añade error." data-i18n-attr="data-ok|r2.27@data-ok,data-no|r2.28@data-no"></p>
+  </div>
+</section>
+
+<!-- 9 ---------------------------------------------------------------- -->
+<section class="ch" id="gratis">
+  <p class="eyebrow" data-i18n="gratis.1">Capítulo 9</p>
+  <h2 data-i18n="gratis.2">El bottleneck “gratis”</h2>
+  <p data-i18n="gratis.3">Antes de entrenar nada, podemos simular un bottleneck con el modelo de Meta tal cual. “Gratis” = sin reentrenar:</p>
+  <ol>
+    <li data-i18n="gratis.4">Coger las 20 salidas del modelo en cada instante.</li>
+    <li data-i18n="gratis.5">Pasarlas a coordenadas PCA (20 números en otra base).</li>
+    <li data-i18n="gratis.6">Quedarnos con las <i>k</i> primeras y poner el resto a cero.</li>
+    <li data-i18n="gratis.7">Volver a 20 ángulos y medir el error contra la verdad.</li>
+  </ol>
+  <p data-i18n="gratis.8">Haciendo lo mismo con la <b>verdad</b> obtenemos el <b>suelo</b>: el error mínimo que cuesta comprimir a <i>k</i> dimensiones, aunque el decodificador fuera perfecto. (La PCA se ajusta sin la tarea que se evalúa, para no hacer trampa.)</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="gratis.9">Comprimir la salida de Meta</p>
+    <p class="lab-sub" data-i18n="gratis.10">Error medio por articulación (grados). Línea discontinua: el modelo con sus 20 salidas.</p>
+    <div class="controls">
+      <div class="seg" id="bnModel" role="group" aria-label="Modelo" data-i18n-attr="aria-label|gratis.11@aria-label"><button type="button" data-v="regression" aria-pressed="true" data-i18n="gratis.12">regresión</button><button type="button" data-v="tracking" aria-pressed="false" data-i18n="gratis.13">tracking</button></div>
+      <label for="bnK"><span class="lt" data-i18n="gratis.14">k</span><input id="bnK" type="range" min="0" max="10" value="6"><output id="bnKo">8</output></label>
+    </div>
+    <svg class="chart" id="bnSvg" viewBox="0 0 760 290" role="img" aria-label="Error en función de k para la salida comprimida y para la verdad comprimida" data-i18n-attr="aria-label|gratis.15@aria-label"></svg>
+    <div class="legend"><span style="--c:var(--ink)" data-i18n="gratis.16">modelo completo (20)</span><span id="bnLegC" style="--c:var(--s2)" data-i18n="gratis.17">salida comprimida a k</span><span style="--c:var(--grey)" data-i18n="gratis.18">verdad comprimida (suelo)</span></div>
+    <div class="readout" id="bnRead"></div>
+  </div>
+  <p data-i18n="gratis.19">En <b>regresión</b>, quedarse con 6-12 dimensiones <b>baja</b> el error (13,1° → 12,8°): las dimensiones que tiramos eran ruido. En <b>tracking</b> cuesta poco: +0,3° con k = 12, +1,1° con k = 8. Y fíjate: el error comprimido es mucho menor que “error del modelo + suelo”, porque lo que se tira son justo las direcciones en las que el modelo ya se equivocaba.</p>
+  <div class="quiz" data-answer="0">
+    <p class="q" data-i18n="gratis.20">Si al comprimir la salida a k = 8 el error no sube, ¿qué nos dice?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="gratis.21">Que las 12 dimensiones descartadas no aportaban nada útil</button>
+      <button class="opt" type="button" data-i18n="gratis.22">Que la mano solo tiene 8 dimensiones</button>
+      <button class="opt" type="button" data-i18n="gratis.23">Que el modelo está mal entrenado</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Sí. Eso es lo que hace plausible la Stage 2." data-no="La mano necesita ~8 para describirse, pero aquí la pregunta es otra: lo descartado no ayudaba al modelo." data-i18n-attr="data-ok|gratis.24@data-ok,data-no|gratis.25@data-no"></p>
+  </div>
+</section>
+
+<!-- 10 --------------------------------------------------------------- -->
+<section class="ch" id="tolerancia">
+  <p class="eyebrow" data-i18n="tolerancia.1">Capítulo 10</p>
+  <h2 data-i18n="tolerancia.2">Tolerancia: ¿cuánto peor aceptamos?</h2>
+  <p data-i18n="tolerancia.3">Comprimir mucho (k pequeño) es más simple, pero puede costar precisión. La <b>tolerancia δ</b> es cuánto peor aceptamos que sea el modelo comprimido. δ = 5 % significa: si el modelo completo tiene 13,1° de error, aceptamos hasta 13,1 × 1,05 = 13,8°. Luego buscamos el <b>k más pequeño</b> que cumple.</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="tolerancia.4">Elegir δ y leer el k mínimo</p>
+    <p class="lab-sub" data-i18n="tolerancia.5">La línea roja es el máximo aceptado. Los puntos rellenos cumplen; el anillo marca el k más pequeño que cumple.</p>
+    <div class="controls"><label for="tolD"><span class="lt" data-i18n="tolerancia.6">δ</span><input id="tolD" type="range" min="0" max="25" value="5"><output id="tolDo">5 %</output></label></div>
+    <div class="two">
+      <svg class="chart" id="tolA" viewBox="0 0 380 250" role="img" aria-label="Regresión: error comprimido y umbral de tolerancia" data-i18n-attr="aria-label|tolerancia.7@aria-label"></svg>
+      <svg class="chart" id="tolB" viewBox="0 0 380 250" role="img" aria-label="Tracking: error comprimido y umbral de tolerancia" data-i18n-attr="aria-label|tolerancia.8@aria-label"></svg>
+    </div>
+    <div class="readout" id="tolRead"></div>
+  </div>
+  <h3 data-i18n="tolerancia.9">¿De dónde sale el 5 %?</h3>
+  <p data-i18n="tolerancia.10">De ningún sitio mágico, y por eso hay que justificarlo. Analogía: si tu báscula marca ±0,2 kg cada vez que te subes, no puedes decir que has adelgazado 0,1 kg. Con los modelos pasa lo mismo: entrenar el mismo modelo dos veces con distinta semilla aleatoria da errores un poco distintos. <b>Diferencias menores que esa variación no significan nada.</b> El plan:</p>
+  <ol>
+    <li data-i18n="tolerancia.11">Entrenar el modelo directo (20 salidas) <b>≥ 3 veces</b> con semillas distintas y medir cuánto varía.</li>
+    <li data-i18n="tolerancia.12">Fijar δ a partir de esa variación <b>antes</b> de mirar los resultados comprimidos (pre-registro: así nadie puede acusarnos de elegir δ a medida).</li>
+    <li data-i18n="tolerancia.13">Hacer un <b>test de no inferioridad</b>: en vez de demostrar “es mejor”, demostrar “no es peor que δ”, emparejando por persona en los 20 usuarios de test.</li>
+  </ol>
+  <p data-i18n="tolerancia.14"><b>¿Por qué k ∈ {4, 6, 8, 12}?</b> 4: donde la regresión ya iguala al modelo completo. 6-8: la zona del 90 % de la variación. 12: donde tracking queda dentro del 5 %. (La propuesta ya mencionaba 2, 4, 6, 8, 12, 16.) El ruido de las etiquetas de captura de movimiento es diminuto (~0,1°), así que no sirve para fijar δ.</p>
+  <div class="quiz" data-answer="2">
+    <p class="q" data-i18n="tolerancia.15">El modelo completo tiene 10° de error y δ = 5 %. ¿Qué k aceptas?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-i18n="tolerancia.16">Cualquiera con error menor que 5°</button>
+      <button class="opt" type="button" data-i18n="tolerancia.17">Solo k = 20</button>
+      <button class="opt" type="button" data-i18n="tolerancia.18">El más pequeño con error ≤ 10,5°</button>
+    </div>
+    <p class="fb" hidden="" data-ok="Eso: 10 × 1,05 = 10,5°." data-no="δ es relativo al modelo completo: 10° × 1,05 = 10,5°, y buscamos el k más pequeño por debajo." data-i18n-attr="data-ok|tolerancia.19@data-ok,data-no|tolerancia.20@data-no"></p>
+  </div>
+</section>
+
+<!-- 11 --------------------------------------------------------------- -->
+<section class="ch" id="usuarios">
+  <p class="eyebrow" data-i18n="usuarios.1">Capítulo 11</p>
+  <h2 data-i18n="usuarios.2">Generalizar a gente nueva: cómo se valida</h2>
+  <p data-i18n="usuarios.3">El modelo de Meta <b>no</b> se entrenó con todos los usuarios. El dataset está partido de antemano: <b>158 personas</b> para entrenar, y otras <b>15 (validación) + 20 (test)</b> que el modelo nunca ve. Además, <b>6 de las 29 tareas</b> se guardan aparte. Eso da tres pruebas de generalización:</p>
+  <div class="lab">
+    <p class="lab-title" data-i18n="usuarios.4">Las particiones de emg2pose</p>
+    <p class="lab-sub" data-i18n="usuarios.5">Esquema: cada fila es una persona, cada columna una tarea. Pulsa una condición para resaltarla.</p>
+    <div class="controls"><div class="seg" id="splitSel" role="group" aria-label="Condición" data-i18n-attr="aria-label|usuarios.6@aria-label">
+      <button type="button" data-v="all" aria-pressed="true" data-i18n="usuarios.7">todo</button>
+      <button type="button" data-v="train" aria-pressed="false" data-i18n="usuarios.8">entrenamiento</button>
+      <button type="button" data-v="user" aria-pressed="false" data-i18n="usuarios.9">persona nueva</button>
+      <button type="button" data-v="stage" aria-pressed="false" data-i18n="usuarios.10">tarea nueva</button>
+      <button type="button" data-v="both" aria-pressed="false" data-i18n="usuarios.11">las dos</button>
+    </div></div>
+    <svg class="chart" id="splitSvg" viewBox="0 0 760 300" role="img" aria-label="Rejilla de personas por tareas coloreada por partición" data-i18n-attr="aria-label|usuarios.12@aria-label"></svg>
+    <p class="note" id="splitTxt"></p>
+  </div>
+  <p data-i18n="usuarios.13"><b>Cómo lo validaremos nosotros</b>, paso a paso:</p>
+  <ol>
+    <li data-i18n="usuarios.14">Ajustar la PCA (o el autoencoder) <b>solo con las poses de las personas de entrenamiento</b>.</li>
+    <li data-i18n="usuarios.15">Entrenar el modelo directo y los modelos con bottleneck con esas mismas personas.</li>
+    <li data-i18n="usuarios.16">Medir el error (grados y mm) en las personas y tareas que <b>nadie ha visto</b>, en las tres condiciones.</li>
+    <li data-i18n="usuarios.17">Comparar persona a persona: ¿el bottleneck tiene error igual o menor? ¿Se reduce el salto entre el error en entrenamiento y en gente nueva?</li>
+  </ol>
+  <p data-i18n="usuarios.18">Así que no es solo “ver si el error no sube”: la hipótesis del proyecto es que el bottleneck <b>mejora</b> (o al menos no empeora más de δ) en gente nueva, porque obliga al modelo a predecir lo que la EMG realmente contiene. Nuestro usuario del dataset mini es de validación: el modelo nunca lo vio, por eso sus números (9,2° y 13,0°) ya son de generalización.</p>
+</section>
+
+<!-- 12 --------------------------------------------------------------- -->
+<section class="ch" id="metodos">
+  <p class="eyebrow" data-i18n="metodos.1">Capítulo 12</p>
+  <h2 data-i18n="metodos.2">PCA, autoencoder y alternativas</h2>
+  <p data-i18n="metodos.3"><b>¿Importa PCA contra autoencoder para regresión?</b> Sí. En emg2pose, incluso el modelo de “regresión” predice la posición solo los primeros 250 ms y luego <b>integra velocidades</b>. Con PCA eso es trivial: como es lineal, la velocidad del latente es el latente de la velocidad, y se puede integrar en el espacio latente sin más. Un autoencoder <b>también puede aprenderlo</b> (predecir la velocidad del latente e integrarla), pero esa velocidad depende de en qué postura está la mano, así que es más difícil. En nuestros datos el autoencoder no comprime mejor que PCA, así que PCA es la línea base natural.</p>
+  <div class="tablewrap"><table class="t">
+    <tbody><tr><th data-i18n="metodos.4">Método</th><th data-i18n="metodos.5">Idea</th><th data-i18n="metodos.6">¿Lineal?</th><th data-i18n="metodos.7">¿Usa la EMG para elegir las direcciones?</th></tr>
+    <tr><td data-i18n="metodos.8">PCA</td><td data-i18n="metodos.9">direcciones de máxima variación de la pose</td><td data-i18n="metodos.10">sí</td><td data-i18n="metodos.11">no</td></tr>
+    <tr><td data-i18n="metodos.12">Sparse PCA</td><td data-i18n="metodos.13">como PCA, pero cada componente usa pocas articulaciones: más fácil de interpretar (por dedo)</td><td data-i18n="metodos.14">sí</td><td data-i18n="metodos.15">no</td></tr>
+    <tr><td data-i18n="metodos.16"><b>Reduced-rank regression</b> / PLS</td><td data-i18n="metodos.17">las k direcciones de la pose <b>que mejor se predicen desde la EMG</b>: un bottleneck lineal supervisado</td><td data-i18n="metodos.18">sí</td><td data-i18n="metodos.19">sí</td></tr>
+    <tr><td data-i18n="metodos.20">Slow Feature Analysis / Dynamical Components Analysis</td><td data-i18n="metodos.21">direcciones que cambian suave o que mejor se predicen en el tiempo</td><td data-i18n="metodos.22">sí</td><td data-i18n="metodos.23">no</td></tr>
+    <tr><td data-i18n="metodos.24">Autoencoder</td><td data-i18n="metodos.25">comprimir y descomprimir con redes</td><td data-i18n="metodos.26">no</td><td data-i18n="metodos.27">no</td></tr>
+    <tr><td data-i18n="metodos.28">CEBRA / contrastivo (CPEP, KinEMbed)</td><td data-i18n="metodos.29">alinear el espacio de la EMG con el de la pose</td><td data-i18n="metodos.30">no</td><td data-i18n="metodos.31">sí</td></tr>
+  </tbody></table></div>
+  <p data-i18n="metodos.32">Recomendación: PCA (base), reduced-rank regression (lo más parecido a PCA pero guiado por la EMG; es “el subespacio decodificable” del capítulo 8 hecho método) y el autoencoder de la propuesta.</p>
+</section>
+
+<!-- 13 --------------------------------------------------------------- -->
+<section class="ch" id="faq">
+  <p class="eyebrow" data-i18n="faq.1">Capítulo 13</p>
+  <h2 data-i18n="faq.2">Tus preguntas, en corto</h2>
+  <details class="faq"><summary data-i18n="faq.3">¿El R² de 0,14 es del modelo de Meta?</summary><p data-i18n="faq.4">No. Es un modelo lineal nuestro (regresión ridge) que predice la envolvente de cada electrodo a partir del movimiento. Sirve para preguntar qué codifica la EMG, no para medir el modelo de Meta. Los R² del modelo de Meta son los del capítulo 8.</p></details>
+  <details class="faq"><summary data-i18n="faq.5">¿Cómo sabemos qué electrodos llevan postura y cuáles movimiento?</summary><p data-i18n="faq.6">De nuestro análisis, no de la literatura: para cada electrodo comparamos cuánto R² da la posición y cuánto la velocidad. En el dorso (8-14) la posición explica tanto como la velocidad; en la palma (3-7), casi nada. Es 1 persona: tómalo como hipótesis a comprobar con más gente. Que 0-7 sea la palma sí lo apoyan el paper (posición del hueco) y nuestros datos.</p></details>
+  <details class="faq"><summary data-i18n="faq.7">¿Meta pasa la señal a frecuencia?</summary><p data-i18n="faq.8">No. Entra el voltaje crudo. Lo de “filtros pasa-banda” es lo que encontramos al analizar los pesos de su primera capa después del entrenamiento.</p></details>
+  <details class="faq"><summary data-i18n="faq.9">¿Qué es exactamente “gastar las mismas 80 features”?</summary><p data-i18n="faq.10">Comparación justa entre dos maneras de darle 80 números al clasificador: 16 electrodos × 5 bandas, o 16 electrodos × 5 instantes de tiempo. Si las bandas fueran especiales, ganarían. No ganan (capítulo 3).</p></details>
+  <details class="faq"><summary data-i18n="faq.11">¿Qué es el “filtro temporal”?</summary><p data-i18n="faq.12">Los pesos de nuestra regresión con retardos (capítulo 5): cuánto pesa la actividad de hace 0, 20, …, 300 ms. No es del modelo de Meta.</p></details>
+  <details class="faq"><summary data-i18n="faq.13">¿Qué es “k mínimo”?</summary><p data-i18n="faq.14">k es el tamaño del latente: cuántos números predice el modelo en vez de 20. El k mínimo es el más pequeño cuyo error queda dentro de la tolerancia δ (capítulo 10).</p></details>
+  <details class="faq"><summary data-i18n="faq.15">¿Clasificación o regresión?</summary><p data-i18n="faq.16">Regresión: predecir ángulos continuos en el tiempo. Lo que clasificamos en el capítulo 3 era solo una forma de preguntar si las bandas llevan información; el proyecto es de regresión.</p></details>
+</section>
+
+<!-- 14 --------------------------------------------------------------- -->
+<section class="ch" id="lecturas">
+  <p class="eyebrow" data-i18n="lecturas.1">Capítulo 14</p>
+  <h2 data-i18n="lecturas.2">Para leer</h2>
+  <p data-i18n="lecturas.3">Ordenado de más fácil a más técnico. Lo marcado con ★ es lo mínimo.</p>
+  <ul class="reads">
+    <li data-i18n="lecturas.4">★ <a href="https://www.youtube.com/watch?v=spUNpyF58BY" target="_blank" rel="noopener">3Blue1Brown: ¿Qué es la transformada de Fourier?</a> (vídeo, 20 min): capítulo 2.</li>
+    <li data-i18n="lecturas.5">★ <a href="https://setosa.io/ev/principal-component-analysis/" target="_blank" rel="noopener">Setosa: PCA explicada visualmente</a>: capítulo 6.</li>
+    <li data-i18n="lecturas.6"><a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">3Blue1Brown: la esencia del cálculo</a> (derivadas e integrales): capítulo 4.</li>
+    <li data-i18n="lecturas.7"><a href="https://en.wikipedia.org/wiki/Motor_unit" target="_blank" rel="noopener">Wikipedia: Motor unit</a> y <a href="https://en.wikipedia.org/wiki/Electromyography" target="_blank" rel="noopener">Electromyography</a>: capítulo 1.</li>
+    <li data-i18n="lecturas.8"><a href="https://en.wikipedia.org/wiki/Coefficient_of_determination" target="_blank" rel="noopener">Wikipedia: Coefficient of determination (R²)</a> y <a href="https://en.wikipedia.org/wiki/Equivalence_test" target="_blank" rel="noopener">Equivalence test</a> (familia de la no inferioridad): capítulos 8 y 10.</li>
+    <li data-i18n="lecturas.9">★ <a href="https://www.jneurosci.org/content/18/23/10105" target="_blank" rel="noopener">Santello, Flanders y Soechting (1998). Postural hand synergies for tool use</a>: capítulo 7.</li>
+    <li data-i18n="lecturas.10">★ <a href="https://arxiv.org/abs/2412.02725" target="_blank" rel="noopener">Salter et al. (2024). emg2pose</a> (el benchmark; mira la sección del modelo y el apéndice de la pulsera) y su <a href="https://github.com/facebookresearch/emg2pose" target="_blank" rel="noopener">código</a>.</li>
+    <li data-i18n="lecturas.11"><a href="https://scholar.google.com/scholar?q=A+generic+non-invasive+neuromotor+interface+for+human-computer+interaction" target="_blank" rel="noopener">CTRL-labs at Reality Labs (2025). A generic non-invasive neuromotor interface</a> (Nature): la misma pulsera a gran escala.</li>
+    <li data-i18n="lecturas.12"><a href="https://scholar.google.com/scholar?q=The+extraction+of+neural+strategies+from+the+surface+EMG+an+update" target="_blank" rel="noopener">Farina, Merletti y Enoka (2014). The extraction of neural strategies from the surface EMG: an update</a>: qué se puede y qué no leer de la sEMG.</li>
+    <li data-i18n="lecturas.13"><a href="https://scholar.google.com/scholar?q=Combinations+of+muscle+synergies+in+the+construction+of+a+natural+motor+behavior" target="_blank" rel="noopener">d’Avella, Saltiel y Bizzi (2003). Muscle synergies</a>: capítulo 7 (sinergias musculares).</li>
+    <li data-i18n="lecturas.14"><a href="https://scholar.google.com/scholar?q=The+multivariate+temporal+response+function+mTRF+toolbox" target="_blank" rel="noopener">Crosse et al. (2016). The mTRF toolbox</a>: capítulo 5 (regresión con retardos).</li>
+    <li data-i18n="lecturas.15"><a href="https://scholar.google.com/scholar?q=Analysis+of+the+synergies+underlying+complex+hand+manipulation" target="_blank" rel="noopener">Todorov y Ghahramani (2004). Synergies in complex hand manipulation</a>: por qué fuera de los agarres hacen falta más dimensiones.</li>
+  </ul>
+  <p class="note" data-i18n="lecturas.16">¿Una pregunta concreta? Llévala al chat de Claude Code del proyecto, con el capítulo y el laboratorio del que hablas. Los notebooks de cada tema: <code>motor_units_zoom</code>, <code>spectral_spatial_fingerprints</code>, <code>emg_kinematics_encoding</code>, <code>emg_angle_correlation</code>, <code>joint_space_manifold</code>, <code>compression_tolerance</code>, <code>pipeline_overview</code>.</p>
+</section>
+</main>
+</div>
+<div class="tip" id="tip" hidden=""></div>
+
+<script>
+"use strict";
+// ---------------------------------------------------------------- i18n
+let LANG = "es";
+const T = o => (o[LANG] != null ? o[LANG] : o.es);
+const DICT = {};
+const langHooks = [];
+
+// ---------------------------------------------------------------- helpers
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fmt = (x, d = 2) => { const s = x.toFixed(d); return LANG === "en" ? s : s.replace(".", ","); };
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function scale(d0, d1, r0, r1) { return v => r0 + (v - d0) / (d1 - d0) * (r1 - r0); }
+function niceTicks(a, b, n = 5) {
+  const step = Math.pow(10, Math.floor(Math.log10((b - a) / n)));
+  const err = (b - a) / n / step;
+  const s = step * (err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1);
+  const out = [];
+  for (let v = Math.ceil(a / s) * s; v <= b + 1e-9; v += s) out.push(+v.toFixed(10));
+  return out;
+}
+// Axes: draws grid + labels into an svg with viewBox (W,H); returns scales and a plot group.
+function axes(svg, o) {
+  svg.innerHTML = "";
+  const [W, H] = svg.getAttribute("viewBox").split(" ").slice(2).map(Number);
+  const m = Object.assign({ l: 46, r: 12, t: 12, b: 36 }, o.m || {});
+  const sx = scale(o.x[0], o.x[1], m.l, W - m.r), sy = scale(o.y[0], o.y[1], H - m.b, m.t);
+  const g = el("g", {}, svg);
+  (o.yticks || niceTicks(o.y[0], o.y[1], 4)).forEach(v => {
+    el("line", { x1: m.l, x2: W - m.r, y1: sy(v), y2: sy(v), class: "grid" }, g);
+    const t = el("text", { x: m.l - 6, y: sy(v) + 4, "text-anchor": "end" }, g); t.textContent = o.yfmt ? o.yfmt(v) : v;
+  });
+  (o.xticks || niceTicks(o.x[0], o.x[1], 6)).forEach(v => {
+    const t = el("text", { x: sx(v), y: H - m.b + 16, "text-anchor": "middle" }, g); t.textContent = o.xfmt ? o.xfmt(v) : v;
+  });
+  el("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "axis" }, g);
+  if (o.xlab) { const t = el("text", { x: (m.l + W - m.r) / 2, y: H - 4, "text-anchor": "middle" }, g); t.textContent = o.xlab; }
+  if (o.ylab) { const t = el("text", { x: 12, y: (m.t + H - m.b) / 2, "text-anchor": "middle", transform: `rotate(-90 12 ${(m.t + H - m.b) / 2})` }, g); t.textContent = o.ylab; }
+  return { sx, sy, g, W, H, m };
+}
+function path(pts) { let d = ""; let pen = false; for (const [x, y] of pts) { if (y == null || isNaN(y)) { pen = false; continue; } d += (pen ? "L" : "M") + x.toFixed(1) + "," + y.toFixed(1); pen = true; } return d; }
+
+// tooltip: pointer hover, plus keyboard focus / tap on elements that can take focus (the info buttons)
+const tip = $("#tip");
+function showTip(text, x, y) {
+  tip.textContent = text; tip.hidden = false;
+  tip.style.left = Math.max(8, Math.min(x, window.innerWidth - tip.offsetWidth - 8)) + "px";
+  tip.style.top = Math.min(y, window.innerHeight - tip.offsetHeight - 8) + "px";
+}
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { if (!(document.activeElement && document.activeElement.matches && document.activeElement.matches(".info"))) tip.hidden = true; return; }
+  showTip(t.getAttribute("data-tip"), e.clientX + 14, e.clientY + 14);
+});
+document.addEventListener("focusin", e => {
+  const t = e.target.closest && e.target.closest(".info[data-tip]");
+  if (!t) return;
+  const r = t.getBoundingClientRect(); showTip(t.getAttribute("data-tip"), r.left, r.bottom + 8);
+});
+document.addEventListener("focusout", e => { if (e.target.matches && e.target.matches(".info")) tip.hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") tip.hidden = true; });
+
+// segmented controls
+function seg(id, onChange) {
+  const box = document.getElementById(id);
+  box.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $$("button", box).forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    onChange(b.dataset.v);
+  });
+  return () => $("button[aria-pressed=true]", box).dataset.v;
+}
+// canvas setup (crisp on retina, width = container)
+function fitCanvas(c) {
+  if (!c.dataset.h) c.dataset.h = c.getAttribute("height");   // CSS height, read once (c.height is overwritten below)
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = +c.dataset.h;
+  c.style.height = h + "px"; c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  const ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w, h };
+}
+const redrawers = [];
+const onTheme = () => redrawers.forEach(f => f());
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", onTheme);
+new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+let rzT; window.addEventListener("resize", () => { clearTimeout(rzT); rzT = setTimeout(onTheme, 120); });
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function gauss(r) { return Math.sqrt(-2 * Math.log(r() + 1e-12)) * Math.cos(2 * Math.PI * r()); }
+
+// ---------------------------------------------------------------- language switch
+(function i18n() {
+  const ORIG = {};
+  $$("[data-i18n]").forEach(e => { ORIG[e.dataset.i18n] = e.innerHTML; });
+  $$("[data-i18n-attr]").forEach(e => e.dataset.i18nAttr.split(",").forEach(p => { const [a, k] = p.split("|"); ORIG[k] = e.getAttribute(a); }));
+  function apply(d) {
+    $$("[data-i18n]").forEach(e => { const k = e.dataset.i18n, v = d && d[k] != null ? d[k] : ORIG[k]; if (e.innerHTML !== v) e.innerHTML = v; });
+    $$("[data-i18n-attr]").forEach(e => e.dataset.i18nAttr.split(",").forEach(p => { const [a, k] = p.split("|"); e.setAttribute(a, d && d[k] != null ? d[k] : ORIG[k]); }));
+  }
+  async function setLang(l, store) {
+    if (l !== "es" && !DICT[l]) {
+      try { DICT[l] = await (await fetch(l + ".json")).json(); }
+      catch (e) { $("#score").textContent = l === "fr" ? "Traduction indisponible pour l’instant." : "Translation unavailable right now."; return; }
+    }
+    LANG = l; document.documentElement.lang = l;
+    apply(l === "es" ? null : DICT[l]);
+    $$("#langSel button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === l ? "true" : "false"));
+    if (store) { try { localStorage.setItem("emg-guide-lang", l); } catch (e) {} }
+    langHooks.forEach(f => f()); onTheme();
+  }
+  $("#langSel").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setLang(b.dataset.v, true); });
+  let saved = null; try { saved = localStorage.getItem("emg-guide-lang"); } catch (e) {}
+  window.__initLang = () => { if (saved && saved !== "es" && ["en", "fr"].includes(saved)) setLang(saved, false); };
+})();
+
+// ---------------------------------------------------------------- quizzes
+(function quizzes() {
+  const qs = $$(".quiz"); let ok = 0, done = 0;
+  const KEY = "emg-guide-quiz";
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { saved = {}; }
+  const upd = () => {
+    const left = qs.length - done;
+    $("#score").textContent = T({ es: `Quiz: ${ok} / ${qs.length} aciertos`, en: `Quiz: ${ok} / ${qs.length} correct`, fr: `Quiz : ${ok} / ${qs.length} bonnes réponses` })
+      + (left ? T({ es: ` · ${left} sin responder`, en: ` · ${left} unanswered`, fr: ` · ${left} sans réponse` }) : "");
+  };
+  const render = (q) => {
+    const fb = $(".fb", q), right = q.dataset.right === "1";
+    fb.innerHTML = `<span class="tag ${right ? "ok" : "no"}">${right ? T({ es: "Correcto.", en: "Correct.", fr: "Correct." }) : T({ es: "No del todo.", en: "Not quite.", fr: "Pas tout à fait." })}</span> ` + (right ? fb.dataset.ok : fb.dataset.no);
+  };
+  qs.forEach((q, qi) => {
+    const ans = +q.dataset.answer, opts = $$("button.opt", q), fb = $(".fb", q);
+    const answer = (i, store) => {
+      if (q.dataset.done) return; q.dataset.done = 1; done++;
+      opts.forEach((b, j) => { b.disabled = true; if (j === ans) b.classList.add("right"); else if (j === i) b.classList.add("wrong"); });
+      const right = i === ans; if (right) ok++;
+      q.dataset.right = right ? "1" : "0"; render(q); fb.hidden = false; upd();
+      if (store) { saved[qi] = i; try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+    };
+    opts.forEach((b, i) => b.addEventListener("click", () => answer(i, true)));
+    if (saved[qi] != null) answer(saved[qi], false);
+  });
+  upd();
+  langHooks.push(() => { qs.forEach(q => { if (q.dataset.done) render(q); }); upd(); });
+})();
+
+// table of contents highlight
+(function toc() {
+  const links = $$("#toc a"); const map = new Map(links.map(a => [a.getAttribute("href").slice(1), a]));
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { links.forEach(a => a.classList.remove("on")); const a = map.get(e.target.id); if (a) a.classList.add("on"); } }), { rootMargin: "-40% 0px -55% 0px" });
+  $$("section.ch").forEach(s => io.observe(s));
+})();
+
+// ---------------------------------------------------------------- 1. motor units
+(function motorUnits() {
+  const c = $("#muCanvas"), FS = 2000, LOOP = 2 * FS, WIN = 0.4 * FS;
+  let sig, trains, t0 = 0, playing = !reduceMotion, last = 0;
+  const muap = (sigma) => { const k = []; for (let i = -30; i <= 30; i++) { const tt = i / 2; k.push(-tt / sigma * Math.exp(-tt * tt / (2 * sigma * sigma))); } const mx = Math.max(...k.map(Math.abs)); return k.map(v => v / mx); };
+  function build() {
+    const N = +$("#muN").value, rate = +$("#muR").value, r = rng(7);
+    sig = new Float32Array(LOOP); trains = [];
+    for (let i = 0; i < N; i++) {
+      const amp = 0.35 + 0.65 * r(), sigma = 0.6 + 2.2 * r(), rr = rate * (0.8 + 0.4 * r());
+      const k = muap(sigma), spikes = [];
+      let t = r() / rr;
+      while (t < 2) { spikes.push(Math.floor(t * FS)); t += Math.max(0.006, (1 + 0.15 * gauss(r)) / rr); }
+      spikes.forEach(s => { for (let j = 0; j < k.length; j++) { const idx = (s + j - 30 + LOOP) % LOOP; sig[idx] += amp * k[j]; } });
+      trains.push(spikes);
+    }
+    const r2 = rng(3); for (let i = 0; i < LOOP; i++) sig[i] += 0.03 * gauss(r2);
+    draw();
+  }
+  function draw() {
+    const { ctx, w, h } = fitCanvas(c);
+    ctx.clearRect(0, 0, w, h);
+    const ink = tok("--ink"), ink3 = tok("--ink-3"), line = tok("--line"), cols = [tok("--s1"), tok("--s2"), tok("--s3")];
+    const rows = Math.min(trains.length, 12), rasterH = 130, top = 8;
+    ctx.font = "12px " + tok("--body"); ctx.fillStyle = ink3;
+    ctx.fillText(T({ es: "disparos (una fila por unidad", en: "firings (one row per unit", fr: "décharges (une ligne par unité" })
+      + (trains.length > 12 ? T({ es: ", se muestran 12", en: ", 12 shown", fr: ", 12 affichées" }) : "") + ")", 4, top + 4);
+    const rowH = (rasterH - 16) / Math.max(rows, 1);
+    for (let i = 0; i < rows; i++) {
+      const y = top + 14 + i * rowH + rowH / 2;
+      ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      ctx.strokeStyle = i < 3 ? cols[i] : ink3; ctx.lineWidth = 2;
+      trains[i].forEach(s => { const rel = (s - t0 + LOOP) % LOOP; if (rel < WIN) { const x = rel / WIN * w; ctx.beginPath(); ctx.moveTo(x, y - rowH * 0.38); ctx.lineTo(x, y + rowH * 0.38); ctx.stroke(); } });
+    }
+    const y0 = rasterH + 24, sh = h - y0 - 18;
+    ctx.fillStyle = ink3; ctx.fillText(T({ es: "lo que ve el electrodo (suma)", en: "what the electrode sees (sum)", fr: "ce que voit l’électrode (somme)" }), 4, y0 - 6);
+    let mx = 1e-6; for (let i = 0; i < LOOP; i++) mx = Math.max(mx, Math.abs(sig[i]));
+    ctx.strokeStyle = ink; ctx.lineWidth = 1.2; ctx.beginPath();
+    for (let i = 0; i < WIN; i++) { const v = sig[(t0 + i) % LOOP]; const x = i / WIN * w, y = y0 + sh / 2 - v / mx * sh * 0.46; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.stroke();
+    ctx.fillStyle = ink3; ctx.fillText("400 ms", w - 52, h - 4);
+  }
+  function tick(ts) { if (playing) { const dt = Math.min(50, ts - last || 16); t0 = (t0 + Math.round(dt * 0.5)) % LOOP; draw(); } last = ts; requestAnimationFrame(tick); }
+  $("#muN").addEventListener("input", e => { $("#muNo").textContent = e.target.value; build(); });
+  $("#muR").addEventListener("input", e => { $("#muRo").textContent = e.target.value + " Hz"; build(); });
+  const pb = $("#muPlay");
+  const label = () => { pb.textContent = playing ? T({ es: "Pausar", en: "Pause", fr: "Pause" }) : T({ es: "Reproducir", en: "Play", fr: "Lecture" }); };
+  label(); langHooks.push(label);
+  pb.addEventListener("click", () => { playing = !playing; label(); });
+  build(); redrawers.push(draw); requestAnimationFrame(tick);
+})();
+
+// ---------------------------------------------------------------- 2. depth & bands
+(function bands() {
+  const FS = 2000, BANDS = [[20, 60], [60, 120], [120, 250], [250, 500], [500, 900]];
+  const kern = d => { const sigma = 0.45 + 0.17 * d, amp = Math.exp(-d / 4); const k = []; for (let i = -40; i <= 40; i++) { const tt = i / 2; k.push(amp * (-tt / sigma) * Math.exp(-tt * tt / (2 * sigma * sigma))); } return k; };
+  function shares(k) {
+    const N = 1024, P = BANDS.map(() => 0);
+    for (let f = 1; f < N / 2; f++) {
+      let re = 0, im = 0; for (let n = 0; n < k.length; n++) { const a = 2 * Math.PI * f * n / N; re += k[n] * Math.cos(a); im -= k[n] * Math.sin(a); }
+      const hz = f * FS / N, p = re * re + im * im; BANDS.forEach(([lo, hi], b) => { if (hz >= lo && hz < hi) P[b] += p; });
+    }
+    const s = P.reduce((a, b) => a + b, 0) || 1; return P.map(p => 100 * p / s);
+  }
+  const near = kern(2), nearS = shares(near);
+  function draw() {
+    const d = +$("#depth").value, k = kern(d), ks = shares(k);
+    $("#deptho").textContent = fmt(d, 1).replace(/[.,]0$/, "") + " mm";
+    const A = axes($("#muapSvg"), { x: [-20, 20], y: [-1.1, 1.1], xlab: T({ es: "tiempo (ms)", en: "time (ms)", fr: "temps (ms)" }), yticks: [-1, 0, 1], m: { l: 34 } });
+    const nrm = arr => { const m = Math.max(...arr.map(Math.abs)) || 1; return arr.map(v => v / m); };
+    const pts = arr => nrm(arr).map((v, i) => [A.sx((i - 40) / 2), A.sy(v)]);
+    el("path", { d: path(pts(near)), fill: "none", stroke: tok("--grey"), "stroke-width": 2 }, A.g);
+    el("path", { d: path(pts(k)), fill: "none", stroke: tok("--s1"), "stroke-width": 2.5 }, A.g);
+    const B = axes($("#bandSvg"), { x: [0, 5], y: [0, 100], xticks: [], yticks: [0, 25, 50, 75, 100], yfmt: v => v + "%", m: { l: 40, b: 40 } });
+    const bw = (B.sx(1) - B.sx(0));
+    const nearLab = T({ es: "unidad a 2 mm", en: "unit at 2 mm", fr: "unité à 2 mm" }), yourLab = T({ es: "tu unidad", en: "your unit", fr: "ton unité" });
+    BANDS.forEach(([lo, hi], b) => {
+      const x = B.sx(b);
+      el("rect", { x: x + bw * 0.12, width: bw * 0.36, y: B.sy(nearS[b]), height: B.sy(0) - B.sy(nearS[b]), fill: tok("--grey"), rx: 2, "data-tip": `${lo}-${hi} Hz · ${nearLab}: ${fmt(nearS[b], 0)} %` }, B.g);
+      el("rect", { x: x + bw * 0.52, width: bw * 0.36, y: B.sy(ks[b]), height: B.sy(0) - B.sy(ks[b]), fill: tok("--s1"), rx: 2, "data-tip": `${lo}-${hi} Hz · ${yourLab}: ${fmt(ks[b], 0)} %` }, B.g);
+      const t = el("text", { x: x + bw / 2, y: B.H - 22, "text-anchor": "middle" }, B.g); t.textContent = `${lo}-${hi}`;
+    });
+    const t = el("text", { x: (B.sx(0) + B.sx(5)) / 2, y: B.H - 4, "text-anchor": "middle" }, B.g); t.textContent = T({ es: "banda (Hz)", en: "band (Hz)", fr: "bande (Hz)" });
+    const hiNear = nearS[3] + nearS[4], hiK = ks[3] + ks[4], amp = fmt(100 * Math.exp(-(d - 2) / 4), 0);
+    $("#bandRead").innerHTML = T({
+      es: `Energía por encima de 250 Hz: cercana <b>${fmt(hiNear, 0)} %</b> · la tuya <b>${fmt(hiK, 0)} %</b> · amplitud de la tuya respecto a la cercana: <b>${amp} %</b>`,
+      en: `Energy above 250 Hz: near unit <b>${fmt(hiNear, 0)} %</b> · yours <b>${fmt(hiK, 0)} %</b> · amplitude of yours relative to the near one: <b>${amp} %</b>`,
+      fr: `Énergie au-dessus de 250 Hz : unité proche <b>${fmt(hiNear, 0)} %</b> · la tienne <b>${fmt(hiK, 0)} %</b> · amplitude de la tienne par rapport à la proche : <b>${amp} %</b>` });
+  }
+  $("#depth").addEventListener("input", draw); draw(); redrawers.push(draw);
+})();
+
+// ---------------------------------------------------------------- data-driven widgets
+fetch("data.json").then(r => r.json()).then(DATA => {
+  topo(DATA); lagW(DATA); pcaW(DATA); santello(DATA);
+}).catch(() => {
+  ["#topoRead", "#lagRead", "#pcaRead", "#sanRead"].forEach(s => { $(s).textContent = T({ es: "No se pudieron cargar los datos de este laboratorio. Recarga la página.", en: "The data for this lab could not be loaded. Reload the page.", fr: "Impossible de charger les données de ce labo. Recharge la page." }); });
+});
+
+// ---------------------------------------------------------------- 3. ring topography
+const FINGER_LABEL = {
+  "pulgar": { es: "pulgar", en: "thumb", fr: "pouce" }, "índice": { es: "índice", en: "index", fr: "index" },
+  "corazón": { es: "corazón", en: "middle", fr: "majeur" }, "anular": { es: "anular", en: "ring", fr: "annulaire" },
+  "meñique": { es: "meñique", en: "little", fr: "auriculaire" } };
+function topo(DATA) {
+  const fingers = Object.keys(FINGER_LABEL);
+  const fb = $("#topoFinger");
+  fingers.forEach((f, i) => { const b = document.createElement("button"); b.type = "button"; b.dataset.v = f; b.textContent = T(FINGER_LABEL[f]); b.setAttribute("aria-pressed", i === 1 ? "true" : "false"); fb.appendChild(b); });
+  langHooks.push(() => $$("button", fb).forEach(b => { b.textContent = T(FINGER_LABEL[b.dataset.v]); }));
+  const getF = seg("topoFinger", draw), getD = seg("topoDir", draw);
+  $("#topoCommon").addEventListener("change", draw);
+  const A = 210, B = 130, CX = 330, CY = 175;
+  function pos(c) { const th = Math.PI + (c + 0.5) * 2 * Math.PI / 16; return [CX + A * Math.cos(th), CY - B * Math.sin(th)]; }
+  function draw() {
+    const svg = $("#topoSvg"); svg.innerHTML = "";
+    const key = getF() + "|" + getD(), rec = DATA.topo[key];
+    const isFlex = getD() === "flex", col = isFlex ? tok("--s1") : tok("--s2");
+    el("ellipse", { cx: CX, cy: CY, rx: A - 18, ry: B - 18, fill: tok("--surface-2"), stroke: tok("--line") }, svg);
+    const lab = (x, y, s, anchor = "middle") => { const t = el("text", { x, y, "text-anchor": anchor }, svg); t.textContent = s; t.style.fontSize = "13px"; };
+    lab(CX, CY - B + 46, T({ es: "dorso · extensores", en: "back · extensors", fr: "dos · extenseurs" }));
+    lab(CX, CY + B - 34, T({ es: "palma · flexores", en: "palm · flexors", fr: "paume · fléchisseurs" }));
+    lab(CX + A + 30, CY + 4, T({ es: "lado pulgar", en: "thumb side", fr: "côté pouce" }), "start");
+    lab(CX - A - 30, CY + 4, T({ es: "lado meñique", en: "little-finger side", fr: "côté auriculaire" }), "end");
+    lab(CX, CY + 4, T({ es: "muñeca derecha, vista desde la mano", en: "right wrist, seen from the hand", fr: "poignet droit, vu depuis la main" }));
+    if (!rec) { $("#topoRead").textContent = T({ es: "Pocos datos para este movimiento.", en: "Too little data for this movement.", fr: "Trop peu de données pour ce mouvement." }); return; }
+    const common = $("#topoCommon").checked;
+    const mean = rec.raw.reduce((a, b) => a + b, 0) / 16;
+    const v = rec.raw.map(x => common ? x - mean : x);
+    const mx = Math.max(...v.map(Math.abs)) || 1;
+    const chW = T({ es: "canal", en: "channel", fr: "canal" }), unit = T({ es: "log-potencia vs reposo", en: "log power vs rest", fr: "log-puissance vs repos" });
+    for (let c = 0; c < 16; c++) {
+      const [x, y] = pos(c), a = v[c] / mx;
+      const r = 13 + 9 * Math.max(0, a);
+      el("circle", { cx: x, cy: y, r, fill: a > 0 ? col : tok("--surface"), "fill-opacity": a > 0 ? (0.25 + 0.75 * a) : 1, stroke: a > 0 ? col : tok("--grey"), "stroke-width": 2,
+        "data-tip": `${chW} ${c}: ${v[c] > 0 ? "+" : ""}${fmt(v[c], 2)} (${unit})` }, svg);
+      const t = el("text", { x, y: y + 4, "text-anchor": "middle" }, svg); t.textContent = c; t.style.fontSize = "11px"; t.style.fill = a > 0.55 ? tok("--surface") : tok("--ink-2"); t.style.pointerEvents = "none";
+    }
+    const best = v.map((x, i) => [x, i]).sort((p, q) => q[0] - p[0]).slice(0, 3).map(p => p[1]).join(", ");
+    const fName = T(FINGER_LABEL[getF()]);
+    $("#topoRead").innerHTML = T({
+      es: `${fName} · ${isFlex ? "flexionar" : "extender"} · <b>${rec.n}</b> instantes (20 por segundo) · electrodos más activos: <b>${best}</b>`,
+      en: `${fName} · ${isFlex ? "flex" : "extend"} · <b>${rec.n}</b> instants (20 per second) · most active electrodes: <b>${best}</b>`,
+      fr: `${fName} · ${isFlex ? "fléchir" : "étendre"} · <b>${rec.n}</b> instants (20 par seconde) · électrodes les plus actives : <b>${best}</b>` });
+  }
+  draw(); redrawers.push(draw);
+}
+
+// ---------------------------------------------------------------- 4. derivatives
+(function deriv() {
+  const N = 600, dt = 0.01, Tm = Array.from({ length: N }, (_, i) => i * dt);
+  const sig = (t, c, w) => 1 / (1 + Math.exp(-(t - c) / w));
+  const th = Tm.map(t => 10 + 70 * (sig(t, 1.0, 0.12) - sig(t, 3.0, 0.15)) + 45 * (sig(t, 4.6, 0.04) - sig(t, 4.9, 0.05)));
+  const v = th.map((_, i) => { const a = Math.max(0, i - 1), b = Math.min(N - 1, i + 1); return (th[b] - th[a]) / ((b - a) * dt); });
+  const flexor = v.map((x, i) => Math.max(x, 0) * 0.012 + 0.006 * Math.max(th[i] - 10, 0));
+  const extensor = v.map(x => Math.max(-x, 0) * 0.012 + 0.08);
+  const c = $("#derivCanvas");
+  function draw() {
+    const i0 = +$("#dT").value; $("#dTo").textContent = fmt(Tm[i0], 1) + " s";
+    const { ctx, w, h } = fitCanvas(c); ctx.clearRect(0, 0, w, h);
+    const ink = tok("--ink"), ink3 = tok("--ink-3"), line = tok("--line"), s1 = tok("--s1"), s2 = tok("--s2"), bad = tok("--bad");
+    ctx.font = "12px " + tok("--body");
+    const L = 52, R = w - 10, panels = [[6, 150], [168, 290], [308, 412]];
+    const X = i => L + i / (N - 1) * (R - L);
+    function frame(p, lo, hi, label, zero) {
+      const Y = val => p[1] - (val - lo) / (hi - lo) * (p[1] - p[0]);
+      ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(L, p[1]); ctx.lineTo(R, p[1]); ctx.stroke();
+      if (zero) { ctx.beginPath(); ctx.moveTo(L, Y(0)); ctx.lineTo(R, Y(0)); ctx.stroke(); }
+      ctx.fillStyle = ink3; ctx.fillText(label, 4, p[0] + 12); return Y;
+    }
+    const Y1 = frame(panels[0], 0, 130, T({ es: "posición (°)", en: "position (°)", fr: "position (°)" }));
+    ctx.strokeStyle = ink; ctx.lineWidth = 2; ctx.beginPath(); th.forEach((y, i) => i ? ctx.lineTo(X(i), Y1(y)) : ctx.moveTo(X(i), Y1(y))); ctx.stroke();
+    const slope = v[i0], span = 0.35;
+    ctx.strokeStyle = bad; ctx.lineWidth = 2; ctx.beginPath();
+    ctx.moveTo(X(i0 - span / dt), Y1(th[i0] - slope * span)); ctx.lineTo(X(i0 + span / dt), Y1(th[i0] + slope * span)); ctx.stroke();
+    ctx.fillStyle = bad; ctx.beginPath(); ctx.arc(X(i0), Y1(th[i0]), 4, 0, 7); ctx.fill();
+    const vmax = Math.max(...v.map(Math.abs)) * 1.05;
+    const Y2 = frame(panels[1], -vmax, vmax, T({ es: "velocidad (°/s)", en: "velocity (°/s)", fr: "vitesse (°/s)" }), true);
+    ctx.fillStyle = s1; ctx.globalAlpha = 0.22; ctx.beginPath(); ctx.moveTo(X(0), Y2(0));
+    for (let i = 0; i <= i0; i++) ctx.lineTo(X(i), Y2(v[i])); ctx.lineTo(X(i0), Y2(0)); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = s1; ctx.lineWidth = 2; ctx.beginPath(); v.forEach((y, i) => i ? ctx.lineTo(X(i), Y2(y)) : ctx.moveTo(X(i), Y2(y))); ctx.stroke();
+    ctx.fillStyle = bad; ctx.beginPath(); ctx.arc(X(i0), Y2(v[i0]), 4, 0, 7); ctx.fill();
+    const Y3 = frame(panels[2], 0, Math.max(...flexor, ...extensor) * 1.05, T({ es: "actividad muscular (simulada)", en: "muscle activity (simulated)", fr: "activité musculaire (simulée)" }));
+    [[flexor, s1, T({ es: "flexores", en: "flexors", fr: "fléchisseurs" })], [extensor, s2, T({ es: "extensores", en: "extensors", fr: "extenseurs" })]].forEach(([arr, col, name], k) => {
+      ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); arr.forEach((y, i) => i ? ctx.lineTo(X(i), Y3(y)) : ctx.moveTo(X(i), Y3(y))); ctx.stroke();
+      ctx.fillStyle = col; ctx.fillText(name, R - 190 + k * 95, panels[2][0] + 12);
+    });
+    ctx.strokeStyle = ink3; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(X(i0), 4); ctx.lineTo(X(i0), h - 4); ctx.stroke(); ctx.setLineDash([]);
+    const sl = fmt(slope, 0), ar = fmt(th[i0] - th[0], 1);
+    $("#derivRead").innerHTML = T({
+      es: `pendiente en este instante = velocidad = <b>${sl} °/s</b> · área azul acumulada = <b>${ar}°</b> = posición ahora − posición inicial`,
+      en: `slope at this instant = velocity = <b>${sl} °/s</b> · accumulated blue area = <b>${ar}°</b> = position now − initial position`,
+      fr: `pente à cet instant = vitesse = <b>${sl} °/s</b> · aire bleue cumulée = <b>${ar}°</b> = position actuelle − position initiale` });
+  }
+  $("#dT").addEventListener("input", draw); draw(); redrawers.push(draw);
+})();
+
+// ---------------------------------------------------------------- 4b. tracking vs regression
+(function tracking() {
+  const N = 500, dt = 0.01; let seed = 11;
+  const sig = (t, c, w) => 1 / (1 + Math.exp(-(t - c) / w));
+  const th = Array.from({ length: N }, (_, i) => { const t = i * dt; return 15 + 60 * (sig(t, 0.8, 0.12) - sig(t, 2.4, 0.15)) + 40 * sig(t, 3.6, 0.2); });
+  const getM = seg("trkMode", draw);
+  $("#trkNew").addEventListener("click", () => { seed++; draw(); });
+  function draw() {
+    const r = rng(seed); let drift = 0; const noise = [];
+    for (let i = 0; i < N; i++) { drift = 0.97 * drift + 4 * gauss(r); noise.push(drift); }
+    const vtrue = th.map((_, i) => i ? (th[i] - th[i - 1]) / dt : 0);
+    const start = getM() === "known" ? th[0] : 45;
+    const est = [start]; for (let i = 1; i < N; i++) est.push(est[i - 1] + (vtrue[i] + noise[i] + 3) * dt);
+    const A = axes($("#trkSvg"), { x: [0, 5], y: [0, 130], xlab: T({ es: "tiempo (s)", en: "time (s)", fr: "temps (s)" }), ylab: T({ es: "ángulo (°)", en: "angle (°)", fr: "angle (°)" }) });
+    el("path", { d: path(th.map((y, i) => [A.sx(i * dt), A.sy(y)])), fill: "none", stroke: tok("--ink"), "stroke-width": 2 }, A.g);
+    el("path", { d: path(est.map((y, i) => [A.sx(i * dt), A.sy(y)])), fill: "none", stroke: tok("--s1"), "stroke-width": 2 }, A.g);
+    const mae = est.reduce((a, y, i) => a + Math.abs(y - th[i]), 0) / N;
+    const e1 = est.slice(0, 100).reduce((a, y, i) => a + Math.abs(y - th[i]), 0) / 100, e5 = est.slice(400).reduce((a, y, i) => a + Math.abs(y - th[400 + i]), 0) / 100;
+    $("#trkRead").innerHTML = T({
+      es: `error medio <b>${fmt(mae, 1)}°</b> · primer segundo <b>${fmt(e1, 1)}°</b> · último segundo <b>${fmt(e5, 1)}°</b>`,
+      en: `mean error <b>${fmt(mae, 1)}°</b> · first second <b>${fmt(e1, 1)}°</b> · last second <b>${fmt(e5, 1)}°</b>`,
+      fr: `erreur moyenne <b>${fmt(mae, 1)}°</b> · première seconde <b>${fmt(e1, 1)}°</b> · dernière seconde <b>${fmt(e5, 1)}°</b>` });
+  }
+  draw(); redrawers.push(draw);
+})();
+
+// ---------------------------------------------------------------- 5. lag explorer
+function lagW(DATA) {
+  const env = DATA.lag.env, spd = DATA.lag.speed, fs = DATA.lag.fs, N = env.length;
+  const z = a => { const v = a.filter(x => x != null); const m = v.reduce((p, q) => p + q, 0) / v.length; const s = Math.sqrt(v.reduce((p, q) => p + (q - m) ** 2, 0) / v.length); return a.map(x => x == null ? null : (x - m) / s); };
+  const ze = z(env), zs = z(spd);
+  function corrAt(L) { const a = [], b = []; for (let i = 0; i < N; i++) { const j = i - L; if (j < 0 || j >= N || zs[i] == null) continue; a.push(ze[j]); b.push(zs[i]); }
+    const ma = a.reduce((p, q) => p + q, 0) / a.length, mb = b.reduce((p, q) => p + q, 0) / b.length; let sab = 0, saa = 0, sbb = 0;
+    for (let i = 0; i < a.length; i++) { sab += (a[i] - ma) * (b[i] - mb); saa += (a[i] - ma) ** 2; sbb += (b[i] - mb) ** 2; } return sab / Math.sqrt(saa * sbb); }
+  const lags = []; for (let ms = -200; ms <= 300; ms += 20) lags.push([ms, corrAt(Math.round(ms / 1000 * fs))]);
+  const best = lags.reduce((p, q) => q[1] > p[1] ? q : p);
+  function draw() {
+    const ms = +$("#lagS").value; $("#lagSo").textContent = ms + " ms"; const L = Math.round(ms / 1000 * fs);
+    const A = axes($("#lagSvg"), { x: [0, N / fs], y: [-2.5, 5], xlab: T({ es: "tiempo (s)", en: "time (s)", fr: "temps (s)" }), yticks: [-2, 0, 2, 4], m: { l: 30 } });
+    el("path", { d: path(zs.map((y, i) => [A.sx(i / fs), y == null ? null : A.sy(Math.min(y, 5))])), fill: "none", stroke: tok("--s2"), "stroke-width": 1.6 }, A.g);
+    el("path", { d: path(ze.map((y, j) => [A.sx((j + L) / fs), A.sy(Math.max(-2.5, Math.min(y, 5)))]).filter(p => p[0] >= A.sx(0) && p[0] <= A.sx(N / fs))), fill: "none", stroke: tok("--s1"), "stroke-width": 1.4, opacity: 0.9 }, A.g);
+    const C = axes($("#lagCurve"), { x: [-200, 300], y: [-0.3, 0.6], xlab: T({ es: "retardo (ms) · positivo = la EMG va antes", en: "delay (ms) · positive = EMG leads", fr: "retard (ms) · positif = l’EMG précède" }), yticks: [-0.2, 0, 0.2, 0.4, 0.6], yfmt: v => fmt(v, 1), m: { l: 40 } });
+    el("line", { x1: C.sx(0), x2: C.sx(0), y1: C.sy(-0.3), y2: C.sy(0.6), stroke: tok("--line") }, C.g);
+    el("path", { d: path(lags.map(([x, y]) => [C.sx(x), C.sy(y)])), fill: "none", stroke: tok("--ink"), "stroke-width": 2 }, C.g);
+    lags.forEach(([x, y]) => el("circle", { cx: C.sx(x), cy: C.sy(y), r: 8, fill: "transparent", "data-tip": `${x} ms: r = ${fmt(y, 2)}` }, C.g));
+    const cur = corrAt(L);
+    el("circle", { cx: C.sx(ms), cy: C.sy(cur), r: 6, fill: tok("--bad"), stroke: tok("--surface"), "stroke-width": 2 }, C.g);
+    $("#lagRead").innerHTML = T({
+      es: `correlación con este retardo: <b>r = ${fmt(cur, 2)}</b> · máxima: <b>r = ${fmt(best[1], 2)}</b> a <b>${best[0]} ms</b>`,
+      en: `correlation at this delay: <b>r = ${fmt(cur, 2)}</b> · maximum: <b>r = ${fmt(best[1], 2)}</b> at <b>${best[0]} ms</b>`,
+      fr: `corrélation avec ce retard : <b>r = ${fmt(cur, 2)}</b> · maximum : <b>r = ${fmt(best[1], 2)}</b> à <b>${best[0]} ms</b>` });
+  }
+  $("#lagS").addEventListener("input", draw); draw(); redrawers.push(draw);
+}
+
+// ---------------------------------------------------------------- 6. PCA
+function pcaW(DATA) {
+  const names = {
+    "MIDDLE_MCP_FE|RING_MCP_FE": { es: "nudillo corazón vs anular", en: "middle vs ring knuckle", fr: "jointure majeur vs annulaire" },
+    "INDEX_MCP_FE|PINKY_MCP_FE": { es: "nudillo índice vs meñique", en: "index vs little knuckle", fr: "jointure index vs auriculaire" },
+    "THUMB_IP_FE|INDEX_PIP_FE": { es: "pulgar vs índice", en: "thumb vs index", fr: "pouce vs index" } };
+  const pb = $("#pcaPair"); Object.keys(names).forEach((k, i) => { const b = document.createElement("button"); b.type = "button"; b.dataset.v = k; b.textContent = T(names[k]); b.setAttribute("aria-pressed", i ? "false" : "true"); pb.appendChild(b); });
+  langHooks.push(() => $$("button", pb).forEach(b => { b.textContent = T(names[b.dataset.v]); }));
+  let anim = null, S;
+  const getP = seg("pcaPair", () => { stats(); draw(); });
+  function stats() {
+    const P = DATA.pca_pairs[getP()], n = P.length;
+    const mx = P.reduce((a, p) => a + p[0], 0) / n, my = P.reduce((a, p) => a + p[1], 0) / n;
+    let sxx = 0, syy = 0, sxy = 0; P.forEach(([x, y]) => { sxx += (x - mx) ** 2; syy += (y - my) ** 2; sxy += (x - mx) * (y - my); });
+    const best = (0.5 * Math.atan2(2 * sxy, sxx - syy) * 180 / Math.PI + 180) % 180;
+    S = { P, mx, my, sxx: sxx / n, syy: syy / n, sxy: sxy / n, best, r: sxy / Math.sqrt(sxx * syy) };
+  }
+  const c = $("#pcaCanvas");
+  function draw() {
+    const ang = +$("#pcaAng").value; $("#pcaAngo").textContent = ang + "°";
+    const a = ang * Math.PI / 180, ux = Math.cos(a), uy = Math.sin(a);
+    const { ctx, w, h } = fitCanvas(c); ctx.clearRect(0, 0, w, h);
+    const ink = tok("--ink"), ink3 = tok("--ink-3"), line = tok("--line"), s1 = tok("--s1"), s2 = tok("--s2");
+    const lo = -40, hi = 130, side = Math.min(w - 50, h - 40), L = 44, Tp = 8;
+    const X = v => L + (v - lo) / (hi - lo) * side, Y = v => Tp + side - (v - lo) / (hi - lo) * side;
+    ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.font = "12px " + tok("--body"); ctx.fillStyle = ink3;
+    for (let v = -40; v <= 120; v += 40) { ctx.beginPath(); ctx.moveTo(X(v), Y(lo)); ctx.lineTo(X(v), Y(hi)); ctx.stroke(); ctx.beginPath(); ctx.moveTo(X(lo), Y(v)); ctx.lineTo(X(hi), Y(v)); ctx.stroke(); ctx.fillText(v + "°", X(v) - 10, Tp + side + 16); ctx.fillText(v + "°", 6, Y(v) + 4); }
+    const nm = T(names[getP()]).split(" vs ");
+    ctx.fillText("x: " + nm[0] + " · y: " + nm[1], L + 4, Tp + 14);
+    const proj = S.P.map(([x, y]) => (x - S.mx) * ux + (y - S.my) * uy);
+    ctx.strokeStyle = s2; ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
+    S.P.forEach(([x, y], i) => { if (i % 3) return; const px = S.mx + proj[i] * ux, py = S.my + proj[i] * uy; ctx.beginPath(); ctx.moveTo(X(x), Y(y)); ctx.lineTo(X(px), Y(py)); ctx.stroke(); });
+    ctx.globalAlpha = 0.55; ctx.fillStyle = s1;
+    S.P.forEach(([x, y]) => { ctx.beginPath(); ctx.arc(X(x), Y(y), 2.6, 0, 7); ctx.fill(); });
+    ctx.globalAlpha = 1; ctx.strokeStyle = ink; ctx.lineWidth = 2.5; ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, side, side); ctx.clip();
+    ctx.beginPath(); ctx.moveTo(X(S.mx - 200 * ux), Y(S.my - 200 * uy)); ctx.lineTo(X(S.mx + 200 * ux), Y(S.my + 200 * uy)); ctx.stroke(); ctx.restore();
+    const varAlong = S.sxx * ux * ux + 2 * S.sxy * ux * uy + S.syy * uy * uy, tot = S.sxx + S.syy;
+    const bx = L + side + 18;
+    if (w - bx > 120) {
+      ctx.fillStyle = ink3; ctx.fillText(T({ es: "varianza capturada", en: "variance captured", fr: "variance captée" }), bx, Tp + 14);
+      const bh = side - 40; ctx.strokeStyle = line; ctx.strokeRect(bx, Tp + 24, 34, bh);
+      ctx.fillStyle = s1; const fr = varAlong / tot; ctx.fillRect(bx, Tp + 24 + bh * (1 - fr), 34, bh * fr);
+      ctx.fillStyle = ink; ctx.font = "600 16px " + tok("--mono"); ctx.fillText(fmt(100 * fr, 0) + " %", bx + 42, Tp + 24 + bh * (1 - fr) + 6);
+    }
+    const bestVar = (() => { const b = S.best * Math.PI / 180; return S.sxx * Math.cos(b) ** 2 + 2 * S.sxy * Math.cos(b) * Math.sin(b) + S.syy * Math.sin(b) ** 2; })();
+    const p1 = fmt(100 * varAlong / tot, 0), p2 = fmt(100 * bestVar / tot, 0), bA = Math.round(S.best), rr = fmt(S.r, 2);
+    $("#pcaRead").innerHTML = T({
+      es: `esta dirección captura <b>${p1} %</b> · la mejor (PC1, a ${bA}°) captura <b>${p2} %</b> · correlación entre las dos articulaciones <b>r = ${rr}</b>`,
+      en: `this direction captures <b>${p1} %</b> · the best one (PC1, at ${bA}°) captures <b>${p2} %</b> · correlation between the two joints <b>r = ${rr}</b>`,
+      fr: `cette direction capte <b>${p1} %</b> · la meilleure (CP1, à ${bA}°) capte <b>${p2} %</b> · corrélation entre les deux articulations <b>r = ${rr}</b>` });
+  }
+  $("#pcaAng").addEventListener("input", () => { if (anim) cancelAnimationFrame(anim); draw(); });
+  $("#pcaBest").addEventListener("click", () => {
+    const target = Math.round(S.best) % 180, inp = $("#pcaAng");
+    if (reduceMotion) { inp.value = target; draw(); return; }
+    const step = () => { const cur = +inp.value, d = ((target - cur + 270) % 180) - 90; if (Math.abs(d) < 1.5) { inp.value = target; draw(); return; } inp.value = (cur + Math.sign(d) * Math.max(1, Math.abs(d) * 0.12) + 180) % 180; draw(); anim = requestAnimationFrame(step); };
+    step();
+  });
+  stats(); draw(); redrawers.push(draw);
+  // hand slider
+  const txt = {
+    pc1: { es: "PC1: abrir y cerrar los cuatro dedos a la vez. Es la “sinergia” clásica.", en: "PC1: opening and closing the four fingers together. The classic “synergy”.", fr: "CP1 : ouvrir et fermer les quatre doigts ensemble. C’est la « synergie » classique." },
+    pc3: { es: "PC3: índice contra meñique, como señalar. Individualizar dedos.", en: "PC3: index against little finger, like pointing. Finger individuation.", fr: "CP3 : index contre auriculaire, comme pointer. Individualiser les doigts." },
+    pc4: { es: "PC4: el pulgar: pulgar arriba contra pulgar recogido.", en: "PC4: the thumb: thumbs-up versus thumb tucked in.", fr: "CP4 : le pouce : pouce levé contre pouce replié." } };
+  const getH = seg("handPc", () => { const s = $("#handS"); s.max = getH() === "pc1" ? 8 : 4; s.value = getH() === "pc1" ? 4 : 2; showHand(); });
+  function showHand() {
+    const pc = getH(), s = +$("#handS").value, n = pc === "pc1" ? 9 : 5, sg = -2 + 4 * s / (n - 1);
+    const val = (sg > 0 ? "+" : "") + fmt(sg, 1).replace(/[.,]0$/, "");
+    const name = LANG === "fr" ? pc.toUpperCase().replace("PC", "CP") : pc.toUpperCase();
+    $("#handSo").textContent = val + " σ";
+    const img = $("#handImg"); img.src = `hands/${pc}_${s}.png`;
+    img.alt = T({ es: `Mano con ${name} = ${val} desviaciones típicas`, en: `Hand with ${name} = ${val} standard deviations`, fr: `Main avec ${name} = ${val} écarts-types` });
+    $("#handTxt").textContent = T(txt[pc]) + " " + T({ es: `Ahora mismo la ${name} vale ${val} σ: un solo número.`, en: `Right now ${name} = ${val} σ: a single number.`, fr: `En ce moment, la ${name} vaut ${val} σ : un seul nombre.` });
+  }
+  $("#handS").addEventListener("input", showHand); showHand(); langHooks.push(showHand);
+}
+
+// ---------------------------------------------------------------- 7. Santello
+function santello(DATA) {
+  const S = DATA.santello;
+  const getF = seg("sanFrames", draw), getA = seg("sanAngles", draw);
+  function draw() {
+    const key = (getF() === "all" ? "all" : "held") + getA();
+    const A = axes($("#sanSvg"), { x: [0.5, 12.5], y: [40, 100], xticks: [1, 2, 3, 4, 5, 6, 8, 10, 12],
+      xlab: T({ es: "número de componentes", en: "number of components", fr: "nombre de composantes" }),
+      ylab: T({ es: "variación explicada (%)", en: "variation explained (%)", fr: "variation expliquée (%)" }) });
+    el("line", { x1: A.sx(0.5), x2: A.sx(12.5), y1: A.sy(80), y2: A.sy(80), stroke: tok("--ink-3") }, A.g);
+    Object.keys(S).forEach(k => {
+      if (k === key) return;
+      el("path", { d: path(S[k].slice(0, 12).map((y, i) => [A.sx(i + 1), A.sy(y)])), fill: "none", stroke: tok("--grey"), "stroke-width": 1.2, opacity: 0.6 }, A.g);
+    });
+    const cur = S[key], compW = n => T({ es: n > 1 ? "componentes" : "componente", en: n > 1 ? "components" : "component", fr: n > 1 ? "composantes" : "composante" });
+    el("path", { d: path(cur.slice(0, 12).map((y, i) => [A.sx(i + 1), A.sy(y)])), fill: "none", stroke: tok("--s1"), "stroke-width": 3 }, A.g);
+    cur.slice(0, 12).forEach((y, i) => el("circle", { cx: A.sx(i + 1), cy: A.sy(y), r: 4.5, fill: tok("--s1"), stroke: tok("--surface"), "stroke-width": 1.5, "data-tip": `${i + 1} ${compW(i + 1)}: ${fmt(y, 1)} %` }, A.g));
+    const star = el("text", { x: A.sx(2), y: A.sy(80) + 7, "text-anchor": "middle" }, A.g); star.textContent = "★"; star.style.fontSize = "22px"; star.style.fill = tok("--ink");
+    const lab = el("text", { x: A.sx(2) - 10, y: A.sy(80) - 14, "text-anchor": "end" }, A.g); lab.textContent = "Santello 1998";
+    const n90 = cur.findIndex(y => y >= 90) + 1, held = getF() === "held", ang = getA();
+    $("#sanRead").innerHTML = T({
+      es: `PC1 + PC2 = <b>${fmt(cur[1], 1)} %</b> (Santello: &gt; 80 %) · componentes para el 90 %: <b>${n90}</b> · ${held ? "55 posturas quietas" : "todos los instantes"}, ${ang} ángulos`,
+      en: `PC1 + PC2 = <b>${fmt(cur[1], 1)} %</b> (Santello: &gt; 80 %) · components for 90 %: <b>${n90}</b> · ${held ? "55 held postures" : "all instants"}, ${ang} angles`,
+      fr: `CP1 + CP2 = <b>${fmt(cur[1], 1)} %</b> (Santello : &gt; 80 %) · composantes pour 90 % : <b>${n90}</b> · ${held ? "55 postures tenues" : "tous les instants"}, ${ang} angles` });
+  }
+  draw(); redrawers.push(draw);
+}
+
+// ---------------------------------------------------------------- 8. R² toy + per-PC bars
+(function r2() {
+  const N = 200, truth = Array.from({ length: N }, (_, i) => Math.sin(i / 14) + 0.5 * Math.sin(i / 5.3 + 1));
+  const r = rng(5), noise = Array.from({ length: N }, () => gauss(r));
+  $$("[data-preset]").forEach(b => b.addEventListener("click", () => {
+    const p = b.dataset.preset;
+    if (p === "perfect") { $("#r2q").value = 100; $("#r2n").value = 0; }
+    if (p === "mean") { $("#r2q").value = 0; $("#r2n").value = 0; }
+    if (p === "worse") { $("#r2q").value = 20; $("#r2n").value = 100; }
+    draw();
+  }));
+  function draw() {
+    const q = +$("#r2q").value / 100, nz = +$("#r2n").value / 100;
+    $("#r2qo").textContent = Math.round(q * 100) + " %"; $("#r2no").textContent = Math.round(nz * 100) + " %";
+    const m = truth.reduce((a, b) => a + b, 0) / N;
+    const pred = truth.map((y, i) => m + q * (y - m) + nz * 0.9 * noise[i]);
+    const ssr = pred.reduce((a, p, i) => a + (truth[i] - p) ** 2, 0), sst = truth.reduce((a, y) => a + (y - m) ** 2, 0);
+    const R2 = 1 - ssr / sst;
+    const A = axes($("#r2Svg"), { x: [0, N], y: [-2.6, 2.6], xticks: [], yticks: [-2, 0, 2], m: { l: 30, b: 14 } });
+    el("line", { x1: A.sx(0), x2: A.sx(N), y1: A.sy(m), y2: A.sy(m), stroke: tok("--grey"), "stroke-dasharray": "4 4" }, A.g);
+    el("path", { d: path(truth.map((y, i) => [A.sx(i), A.sy(y)])), fill: "none", stroke: tok("--ink"), "stroke-width": 2 }, A.g);
+    el("path", { d: path(pred.map((y, i) => [A.sx(i), A.sy(Math.max(-2.6, Math.min(2.6, y)))])), fill: "none", stroke: tok("--s1"), "stroke-width": 2 }, A.g);
+    const verdict = R2 > 0.95 ? T({ es: "casi perfecta", en: "almost perfect", fr: "presque parfaite" })
+      : R2 > 0.3 ? T({ es: "acierta una parte", en: "gets part of it right", fr: "en capte une partie" })
+      : R2 > -0.05 ? T({ es: "como predecir la media (línea discontinua)", en: "like predicting the mean (dashed line)", fr: "comme prédire la moyenne (ligne pointillée)" })
+      : T({ es: "peor que predecir la media", en: "worse than predicting the mean", fr: "pire que prédire la moyenne" });
+    $("#r2Read").innerHTML = `<b>R² = ${fmt(R2, 2)}</b> · ${verdict}`;
+  }
+  $("#r2q").addEventListener("input", draw); $("#r2n").addEventListener("input", draw);
+  draw(); redrawers.push(draw);
+
+  const trk = [0.86, 0.44, 0.63, 0.52, 0.35, 0.33, 0.39, 0.33, 0.23, 0.25, 0.01, 0.18, 0.11, -0.04, -0.15, -0.33];
+  const reg = [0.79, -0.02, 0.45, 0.11, 0.01, -0.00, 0.09, 0.12, -0.01, -0.23, -0.82, -0.02, -0.39, -1.00, -0.56, -1.18];
+  const vr = [53.2, 12.4, 7.3, 5.4, 4.2, 3.1, 3.0, 2.3, 2.0, 1.3, 1.2, 0.9, 0.8, 0.7, 0.7, 0.6];
+  function bars() {
+    const A = axes($("#pcSvg"), { x: [0, 16], y: [-0.6, 1], xticks: [], yticks: [-0.5, 0, 0.5, 1], yfmt: v => fmt(v, 1), m: { l: 40, b: 46 } });
+    const bw = A.sx(1) - A.sx(0), pc = LANG === "fr" ? "CP" : "PC";
+    const ofPose = T({ es: "de la variación de la pose", en: "of the pose variation", fr: "de la variation de la pose" });
+    el("line", { x1: A.sx(0), x2: A.sx(16), y1: A.sy(0), y2: A.sy(0), stroke: tok("--ink"), "stroke-width": 1 }, A.g);
+    for (let i = 0; i < 16; i++) {
+      [[trk[i], tok("--s1"), 0.1, "tracking"], [reg[i], tok("--s2"), 0.5, T({ es: "regresión", en: "regression", fr: "régression" })]].forEach(([v, col, off, nm]) => {
+        const vv = Math.max(v, -0.6), y = A.sy(Math.max(vv, 0)), hgt = Math.abs(A.sy(vv) - A.sy(0));
+        el("rect", { x: A.sx(i) + bw * off, width: bw * 0.38, y, height: Math.max(hgt, 1), fill: col, rx: 2, "data-tip": `${pc}${i + 1} · ${nm}: R² = ${fmt(v, 2)} · ${fmt(vr[i], 1)} % ${ofPose}` }, A.g);
+      });
+      const t = el("text", { x: A.sx(i) + bw / 2, y: A.H - 30, "text-anchor": "middle" }, A.g); t.textContent = pc + (i + 1);
+      const t2 = el("text", { x: A.sx(i) + bw / 2, y: A.H - 14, "text-anchor": "middle" }, A.g); t2.textContent = vr[i] >= 1 ? Math.round(vr[i]) + "%" : "<1%";
+    }
+  }
+  bars(); redrawers.push(bars);
+})();
+
+// ---------------------------------------------------------------- 9 & 10. bottleneck and tolerance
+const KS = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20];
+const PROJ = { tracking: [13.46, 12.86, 12.32, 11.84, 11.51, 11.30, 10.68, 10.16, 9.90, 9.67, 9.56], regression: [13.95, 13.88, 13.48, 13.23, 13.16, 13.08, 12.86, 12.76, 12.75, 13.05, 13.13] };
+const FULL = { tracking: 9.56, regression: 13.13 };
+const FLOOR = [12.60, 11.10, 10.18, 9.34, 8.62, 8.04, 6.49, 4.98, 4.07, 1.98, 0.00];
+(function bottleneck() {
+  const getM = seg("bnModel", draw);
+  function draw() {
+    const md = getM(), ki = +$("#bnK").value, k = KS[ki], col = md === "tracking" ? tok("--s1") : tok("--s2");
+    $("#bnKo").textContent = k; $("#bnLegC").style.setProperty("--c", col);
+    const A = axes($("#bnSvg"), { x: [0, 21], y: [0, 15], xticks: [1, 4, 8, 12, 16, 20],
+      xlab: T({ es: "k (tamaño del latente)", en: "k (latent size)", fr: "k (taille du latent)" }), ylab: T({ es: "error medio (°)", en: "mean error (°)", fr: "erreur moyenne (°)" }) });
+    el("line", { x1: A.sx(0.5), x2: A.sx(20.5), y1: A.sy(FULL[md]), y2: A.sy(FULL[md]), stroke: tok("--ink"), "stroke-width": 1.5, "stroke-dasharray": "6 4" }, A.g);
+    el("path", { d: path(KS.map((x, i) => [A.sx(x), A.sy(FLOOR[i])])), fill: "none", stroke: tok("--grey"), "stroke-width": 2 }, A.g);
+    el("path", { d: path(KS.map((x, i) => [A.sx(x), A.sy(PROJ[md][i])])), fill: "none", stroke: col, "stroke-width": 2.5 }, A.g);
+    const cW = T({ es: "comprimido", en: "compressed", fr: "compressé" }), fW = T({ es: "suelo", en: "floor", fr: "plancher" });
+    KS.forEach((x, i) => {
+      el("circle", { cx: A.sx(x), cy: A.sy(PROJ[md][i]), r: i === ki ? 7 : 4, fill: col, stroke: tok("--surface"), "stroke-width": 2, "data-tip": `k = ${x}: ${cW} ${fmt(PROJ[md][i], 2)}° · ${fW} ${fmt(FLOOR[i], 2)}°` }, A.g);
+      el("circle", { cx: A.sx(x), cy: A.sy(FLOOR[i]), r: i === ki ? 6 : 3.5, fill: tok("--grey"), stroke: tok("--surface"), "stroke-width": 2 }, A.g);
+    });
+    el("line", { x1: A.sx(k), x2: A.sx(k), y1: A.sy(0), y2: A.sy(15), stroke: tok("--ink-3"), "stroke-dasharray": "2 3" }, A.g);
+    const d = PROJ[md][ki] - FULL[md], dd = (d >= 0 ? "+" : "") + fmt(d, 2);
+    $("#bnRead").innerHTML = T({
+      es: `modelo completo <b>${fmt(FULL[md], 2)}°</b> · comprimido a k = ${k}: <b>${fmt(PROJ[md][ki], 2)}°</b> (${dd}°) · suelo <b>${fmt(FLOOR[ki], 2)}°</b>`,
+      en: `full model <b>${fmt(FULL[md], 2)}°</b> · compressed to k = ${k}: <b>${fmt(PROJ[md][ki], 2)}°</b> (${dd}°) · floor <b>${fmt(FLOOR[ki], 2)}°</b>`,
+      fr: `modèle complet <b>${fmt(FULL[md], 2)}°</b> · compressé à k = ${k} : <b>${fmt(PROJ[md][ki], 2)}°</b> (${dd}°) · plancher <b>${fmt(FLOOR[ki], 2)}°</b>` });
+  }
+  $("#bnK").addEventListener("input", draw); draw(); redrawers.push(draw);
+})();
+(function tolerance() {
+  function panel(svg, md) {
+    const dl = +$("#tolD").value / 100, thr = FULL[md] * (1 + dl), col = md === "tracking" ? tok("--s1") : tok("--s2");
+    const A = axes(svg, { x: [0, 21], y: [8, 15], xticks: [1, 4, 8, 12, 16, 20], xlab: "k", yticks: [8, 10, 12, 14], m: { l: 32, t: 22 } });
+    const t = el("text", { x: A.sx(0.5), y: 14 }, A.g); t.textContent = md === "tracking" ? "tracking" : T({ es: "regresión", en: "regression", fr: "régression" }); t.style.fill = tok("--ink"); t.style.fontSize = "13px";
+    el("line", { x1: A.sx(0.5), x2: A.sx(20.5), y1: A.sy(Math.min(thr, 15)), y2: A.sy(Math.min(thr, 15)), stroke: tok("--bad"), "stroke-width": 2 }, A.g);
+    el("line", { x1: A.sx(0.5), x2: A.sx(20.5), y1: A.sy(FULL[md]), y2: A.sy(FULL[md]), stroke: tok("--ink"), "stroke-width": 1.2, "stroke-dasharray": "6 4" }, A.g);
+    el("path", { d: path(KS.map((x, i) => [A.sx(x), A.sy(PROJ[md][i])])), fill: "none", stroke: col, "stroke-width": 2 }, A.g);
+    let kmin = null; KS.forEach((x, i) => { if (PROJ[md][i] <= thr && kmin == null) kmin = x; });
+    const yes = T({ es: "cumple", en: "passes", fr: "passe" }), no = T({ es: "no cumple", en: "fails", fr: "ne passe pas" });
+    KS.forEach((x, i) => { const okk = PROJ[md][i] <= thr; el("circle", { cx: A.sx(x), cy: A.sy(PROJ[md][i]), r: 4.5, fill: okk ? col : tok("--surface"), stroke: col, "stroke-width": 2, "data-tip": `k = ${x}: ${fmt(PROJ[md][i], 2)}° ${okk ? yes : no}` }, A.g); });
+    if (kmin != null) { const i = KS.indexOf(kmin); el("circle", { cx: A.sx(kmin), cy: A.sy(PROJ[md][i]), r: 10, fill: "none", stroke: tok("--ink"), "stroke-width": 2 }, A.g); }
+    return { kmin, thr };
+  }
+  function draw() {
+    const dl = +$("#tolD").value; $("#tolDo").textContent = dl + " %";
+    const a = panel($("#tolA"), "regression"), b = panel($("#tolB"), "tracking");
+    $("#tolRead").innerHTML = T({
+      es: `regresión: máximo ${fmt(a.thr, 2)}° → <b>k mínimo = ${a.kmin}</b> · tracking: máximo ${fmt(b.thr, 2)}° → <b>k mínimo = ${b.kmin}</b>`,
+      en: `regression: maximum ${fmt(a.thr, 2)}° → <b>minimum k = ${a.kmin}</b> · tracking: maximum ${fmt(b.thr, 2)}° → <b>minimum k = ${b.kmin}</b>`,
+      fr: `régression : maximum ${fmt(a.thr, 2)}° → <b>k minimal = ${a.kmin}</b> · tracking : maximum ${fmt(b.thr, 2)}° → <b>k minimal = ${b.kmin}</b>` });
+  }
+  $("#tolD").addEventListener("input", draw); draw(); redrawers.push(draw);
+})();
+
+// ---------------------------------------------------------------- 11. splits grid
+(function splits() {
+  const ROWS = 20, COLS = 29, testUsers = 4, testStages = 6;
+  const info = {
+    all: { es: "Esquema (no a escala): 158 personas de entrenamiento, 15 de validación y 20 de test; 23 tareas de entrenamiento y 6 apartadas.", en: "Diagram (not to scale): 158 training people, 15 validation and 20 test; 23 training tasks and 6 held out.", fr: "Schéma (pas à l’échelle) : 158 personnes d’entraînement, 15 de validation et 20 de test ; 23 tâches d’entraînement et 6 mises de côté." },
+    train: { es: "Entrenamiento: personas conocidas haciendo tareas conocidas. Es lo único que ve el modelo al aprender.", en: "Training: known people doing known tasks. It is the only thing the model sees while learning.", fr: "Entraînement : personnes connues faisant des tâches connues. C’est la seule chose que le modèle voit pendant l’apprentissage." },
+    user: { es: "Persona nueva: alguien que el modelo nunca vio, haciendo tareas que sí conoce. Nuestro usuario del dataset mini está aquí.", en: "New person: someone the model never saw, doing tasks it does know. Our mini-dataset user is here.", fr: "Nouvelle personne : quelqu’un que le modèle n’a jamais vu, faisant des tâches qu’il connaît. Notre utilisateur du mini dataset est ici." },
+    stage: { es: "Tarea nueva: personas conocidas haciendo movimientos que el modelo nunca vio.", en: "New task: known people doing movements the model never saw.", fr: "Nouvelle tâche : personnes connues faisant des mouvements que le modèle n’a jamais vus." },
+    both: { es: "Las dos: persona nueva haciendo tarea nueva. La prueba más dura.", en: "Both: a new person doing a new task. The hardest test.", fr: "Les deux : une nouvelle personne faisant une nouvelle tâche. Le test le plus dur." },
+  };
+  const getS = seg("splitSel", draw);
+  function cls(r, c) { const u = r >= ROWS - testUsers, s = c >= COLS - testStages; return u && s ? "both" : u ? "user" : s ? "stage" : "train"; }
+  function draw() {
+    const svg = $("#splitSvg"); svg.innerHTML = ""; const sel = getS();
+    const L = 96, Tp = 30, cw = (760 - L - 20) / COLS, ch = (300 - Tp - 30) / ROWS;
+    const col = { train: tok("--grey"), user: tok("--s1"), stage: tok("--s2"), both: tok("--ink") };
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const k = cls(r, c), on = sel === "all" || sel === k;
+      el("rect", { x: L + c * cw + 1, y: Tp + r * ch + 1, width: cw - 2, height: ch - 2, rx: 2, fill: col[k], opacity: on ? (k === "train" ? 0.55 : 0.95) : 0.12 }, svg);
+    }
+    const tx = (x, y, s, a = "start") => { const t = el("text", { x, y, "text-anchor": a }, svg); t.textContent = s; };
+    tx(L, Tp - 10, T({ es: "tareas →", en: "tasks →", fr: "tâches →" }));
+    tx(L - 8, Tp + 10, T({ es: "personas", en: "people", fr: "personnes" }), "end"); tx(L - 8, Tp + 24, "↓", "end");
+    tx(L - 8, Tp + (ROWS - testUsers / 2) * ch + 4, T({ es: "nuevas", en: "new", fr: "nouvelles" }), "end");
+    tx(L + (COLS - testStages / 2) * cw, Tp - 10, T({ es: "nuevas", en: "new", fr: "nouvelles" }), "middle");
+    $("#splitTxt").textContent = T(info[sel]);
+  }
+  draw(); redrawers.push(draw);
+})();
+
+if (window.__initLang) window.__initLang();
+</script>
