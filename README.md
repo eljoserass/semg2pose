@@ -86,8 +86,11 @@ the notebooks: `from semg2pose.data import load_session, JOINT_NAMES, ...`.
 | `spectral_spatial_fingerprints.ipynb` | Band × electrode maps per stage and per finger movement, movement classification, first-layer filters of the network | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/spectral_spatial_fingerprints.ipynb) |
 | `emg_kinematics_encoding.ipynb` | Position vs velocity vs acceleration (encoding models), lagged decoding (mTRF), multiple coherence, muscle synergies | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/emg_kinematics_encoding.ipynb) |
 | `neural_synergies.ipynb` | Exploratory: is the low-dimensional pose structure already in the muscle signal? Crosstalk-controlled EMG dimension, reduced-rank (communication subspace) decoding, decodable vs PCA subspaces, muscle synergies across tasks and hands, validation plan | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/neural_synergies.ipynb) |
+| `cross_user_invariance.ipynb` | Exploratory, 12 users from the full dataset (download with `scripts/partial_dataset/`): pose subspaces are shared across people beyond structured nulls, EMG subspaces are person-specific; leave-one-user-out pose bases | needs local data |
+| `intermuscular_coherence.ipynb` | Exploratory: coherence of rectified EMG within vs between synergy sectors at matched distance, crosstalk controls | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/intermuscular_coherence.ipynb) |
+| `network_internals.ipynb` | Exploratory: dimensionality, readout and alignment of the pretrained vemg2pose encoder features (treated as a neural population) | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/network_internals.ipynb) |
 
-`pipeline_overview` and `compression_tolerance` also download Meta's pretrained checkpoints (~250 MB) to
+`pipeline_overview`, `compression_tolerance` and `network_internals` also download Meta's pretrained checkpoints (~250 MB) to
 `~/emg2pose_model_checkpoints` (helpers in `src/semg2pose/model.py`).
 
 ## License

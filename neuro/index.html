@@ -1,0 +1,608 @@
+<title>Getting Neurosciency</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: same family as "De la EMG a la mano": chapter rail + reading column + lab panels. Violet accent marks the neuro track. */
+:root {
+  --bg: #F6F5FA; --surface: #FFFFFF; --surface-2: #EFEDF6; --ink: #17152B; --ink-2: #4B4862; --ink-3: #6C6984;
+  --line: #DEDBEA; --accent: #5B3FC4; --accent-soft: #ECE7FB;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --grey: #9C9AAE;
+  --good: #1E7F4F; --good-bg: #E3F4EA; --warn: #8A5A00; --warn-bg: #FFF3D6; --bad: #B8342C; --bad-bg: #FBE7E5;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #100F1C; --surface: #191726; --surface-2: #221F33; --ink: #ECEAF5; --ink-2: #B7B3CC; --ink-3: #8E8AA6;
+  --line: #2E2B44; --accent: #B3A1FF; --accent-soft: #2A2450;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --grey: #6F6C86;
+  --good: #58C892; --good-bg: #16322A; --warn: #F2C266; --warn-bg: #3A2E14; --bad: #FF8076; --bad-bg: #3A1D1D; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #100F1C; --surface: #191726; --surface-2: #221F33; --ink: #ECEAF5; --ink-2: #B7B3CC; --ink-3: #8E8AA6;
+  --line: #2E2B44; --accent: #B3A1FF; --accent-soft: #2A2450;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --grey: #6F6C86;
+  --good: #58C892; --good-bg: #16322A; --warn: #F2C266; --warn-bg: #3A2E14; --bad: #FF8076; --bad-bg: #3A1D1D; color-scheme: dark; }
+:root:not([data-lang="en"]) [data-l="en"], :root[data-lang="en"] [data-l="es"] { display: none !important; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.6; }
+.wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 80px; }
+nav.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; max-height: calc(100vh - 48px); overflow: auto; font-size: 15px; }
+nav.rail .brand { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; margin-bottom: 8px; }
+nav.rail ol { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 2px; counter-reset: ch -1; }
+nav.rail li { counter-increment: ch; }
+nav.rail a { display: flex; gap: 10px; padding: 5px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; line-height: 1.3; }
+nav.rail a::before { content: counter(ch); font-family: var(--mono); font-size: 12px; color: var(--ink-3); min-width: 18px; padding-top: 2px; }
+nav.rail a:hover, nav.rail a.on { background: var(--accent-soft); color: var(--ink); }
+main { min-width: 0; max-width: 820px; }
+section.ch { padding-block: 28px 40px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(36px, 5vw, 56px); font-weight: 800; letter-spacing: -0.5px; }
+h2 { font-size: clamp(28px, 3.4vw, 38px); font-weight: 700; margin-bottom: 14px; }
+h3 { font-size: 21px; font-weight: 700; margin: 26px 0 8px; }
+p { margin: 0 0 14px; max-width: 68ch; }
+.lede { font-size: 21px; color: var(--ink-2); max-width: 60ch; }
+a { color: var(--accent); }
+.note { font-size: 15px; color: var(--ink-3); }
+.callout { background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; margin: 18px 0; max-width: 68ch; }
+.callout p:last-child { margin: 0; }
+.honest { background: var(--warn-bg); border-radius: 10px; padding: 14px 18px; margin: 18px 0; max-width: 68ch; }
+.honest p:last-child { margin: 0; }
+.honest .tag { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--warn); display: block; margin-bottom: 4px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 14px; padding: 6px 12px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.seg.lang button { font-family: var(--mono); font-size: 12px; padding: 4px 10px; }
+button:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lab { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin: 20px 0; }
+.lab-title { font-family: var(--display); font-weight: 700; font-size: 17px; margin: 0 0 4px; }
+.lab-sub { font-size: 15px; color: var(--ink-3); margin: 0 0 12px; max-width: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin: 10px 0; font-size: 15px; }
+.controls label { display: flex; gap: 10px; align-items: center; color: var(--ink-2); }
+.controls output, .readout b { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+input[type=range] { accent-color: var(--accent); width: 180px; }
+.readout { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 15px; color: var(--ink-2); margin-top: 8px; }
+svg.chart { display: block; width: 100%; max-width: 100%; }
+svg.chart text { fill: var(--ink-3); font-family: var(--body); font-size: 12px; }
+svg.chart .grid { stroke: var(--line); stroke-width: 1; opacity: 0.7; }
+svg.chart .axis { stroke: var(--line); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--ink-2); margin: 6px 0; }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); vertical-align: middle; margin-right: 6px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.two > * { min-width: 0; }
+table.t { border-collapse: collapse; width: 100%; font-size: 15px; margin: 12px 0; }
+table.t th, table.t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t th { font-family: var(--display); font-weight: 700; }
+.tablewrap { overflow-x: auto; }
+.pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.yes { background: var(--good-bg); color: var(--good); }
+.pill.no { background: var(--bad-bg); color: var(--bad); }
+.pill.open { background: var(--warn-bg); color: var(--warn); }
+.pill.run { background: var(--accent-soft); color: var(--accent); }
+.board { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin: 20px 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.card b { font-family: var(--display); font-size: 17px; }
+.card p { font-size: 15px; color: var(--ink-2); margin: 0; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 18px 0; font-size: 15px; }
+.flow .node { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; text-align: center; line-height: 1.3; }
+.flow .node small { display: block; color: var(--ink-3); font-size: 12px; }
+.flow .arrow { color: var(--ink-3); font-family: var(--mono); }
+.flow .q { border-color: var(--accent); background: var(--accent-soft); }
+.poster { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-size: 16px; }
+.poster h3 { margin-top: 0; }
+ul.reads li { margin-bottom: 8px; }
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 13px; padding: 6px 9px; border-radius: 6px; z-index: 20; max-width: 260px; line-height: 1.35; }
+figure { margin: 16px 0; }
+figure img { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid var(--line); background: #FFFFFF; }
+figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
+.result { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+.result p { font-size: 16px; }
+.pending { border: 1px dashed var(--line); border-radius: 12px; padding: 16px; color: var(--ink-3); font-size: 15px; }
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  nav.rail { position: static; max-height: none; margin-bottom: 8px; }
+  nav.rail ol { flex-direction: row; overflow-x: auto; padding-bottom: 6px; }
+  nav.rail a { white-space: nowrap; }
+  .two { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<div class="wrap">
+<nav class="rail" aria-label="Chapters">
+  <div class="brand">Getting Neurosciency</div>
+  <div class="seg lang" id="langSel" role="group" aria-label="Idioma / Language"><button type="button" data-v="es" aria-pressed="true">ES</button><button type="button" data-v="en" aria-pressed="false">EN</button></div>
+  <ol id="toc">
+    <li><a href="#inicio"><span data-l="es">La pregunta</span><span data-l="en">The question</span></a></li>
+    <li><a href="#crosstalk"><span data-l="es">La trampa del crosstalk</span><span data-l="en">The crosstalk trap</span></a></li>
+    <li><a href="#subespacio"><span data-l="es">Subespacio de comunicación</span><span data-l="en">Communication subspace</span></a></li>
+    <li><a href="#alineado"><span data-l="es">¿Son las sinergias de la pose?</span><span data-l="en">Are they the pose synergies?</span></a></li>
+    <li><a href="#sinergias"><span data-l="es">Sinergias musculares</span><span data-l="en">Muscle synergies</span></a></li>
+    <li><a href="#compartidas"><span data-l="es">¿Compartidas?</span><span data-l="en">Shared?</span></a></li>
+    <li><a href="#resumen"><span data-l="es">Qué dicen los datos</span><span data-l="en">What the data say</span></a></li>
+    <li><a href="#direcciones"><span data-l="es">Otras direcciones</span><span data-l="en">Other directions</span></a></li>
+    <li><a href="#validar"><span data-l="es">Cómo validarlo</span><span data-l="en">How to validate it</span></a></li>
+    <li><a href="#poster"><span data-l="es">Hacia el póster</span><span data-l="en">Towards the poster</span></a></li>
+    <li><a href="#lecturas"><span data-l="es">Para leer</span><span data-l="en">Reading</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<!-- 0 -->
+<section class="ch" id="inicio">
+  <p class="eyebrow">semg2pose · neuro track</p>
+  <h1>Getting Neurosciency</h1>
+  <p class="lede" data-l="es">¿El sistema nervioso ya redujo las dimensiones de la mano antes de que nosotros intentáramos comprimirlas?</p>
+  <p class="lede" data-l="en">Did the nervous system already reduce the dimensions of the hand before we tried to compress them?</p>
+  <p data-l="es">En la guía vimos que la postura de la mano se describe con pocas dimensiones (sinergias) y que un decodificador solo lee unas pocas desde la EMG. La pregunta de neurociencia es <b>dónde nace</b> esa simplicidad. Hay un debate clásico en control motor:</p>
+  <p data-l="en">In the guide we saw that hand posture is described by a few dimensions (synergies) and that a decoder reads only a few of them from the EMG. The neuroscience question is <b>where</b> that simplicity comes from. There is a classic debate in motor control:</p>
+  <div class="two">
+    <div class="card"><b data-l="es">Sinergias neurales</b><b data-l="en">Neural synergies</b><p data-l="es">El cerebro y la médula mandan pocas órdenes compartidas a grupos de músculos. Así simplifican el control de una mano con decenas de músculos.</p><p data-l="en">The brain and spinal cord send a few shared commands to groups of muscles, which simplifies controlling a hand with dozens of muscles.</p></div>
+    <div class="card"><b data-l="es">Sinergias de la tarea y la mecánica</b><b data-l="en">Task and mechanical synergies</b><p data-l="es">Los músculos se controlan por separado, pero la anatomía (tendones compartidos) y lo que pide la tarea hacen que el movimiento resultante parezca de pocas dimensiones.</p><p data-l="en">Muscles are controlled independently, but anatomy (shared tendons) and task demands make the resulting movement look low-dimensional.</p></div>
+  </div>
+  <div class="flow" aria-label="cortex, spinal cord, muscles, hand">
+    <div class="node"><span data-l="es">corteza</span><span data-l="en">cortex</span><small data-l="es">intención</small><small data-l="en">intention</small></div><span class="arrow">→</span>
+    <div class="node q"><span data-l="es">médula</span><span data-l="en">spinal cord</span><small data-l="es">¿pocas órdenes?</small><small data-l="en">few commands?</small></div><span class="arrow">→</span>
+    <div class="node q"><span data-l="es">músculos (EMG)</span><span data-l="en">muscles (EMG)</span><small data-l="es">¿pocas dimensiones?</small><small data-l="en">few dimensions?</small></div><span class="arrow">→</span>
+    <div class="node"><span data-l="es">mano</span><span data-l="en">hand</span><small data-l="es">pocas sinergias (lo sabemos)</small><small data-l="en">few synergies (we know)</small></div>
+  </div>
+  <p data-l="es">Con una persona y 16 electrodos no lo vamos a resolver. Esta página <b>explora</b>, dice qué resultados aguantan y cuáles no, y diseña las pruebas que el dataset completo (193 personas) podría hacer. Es el material de partida para un póster en la Bernstein Conference.</p>
+  <p data-l="en">With one person and 16 electrodes we will not settle it. This page <b>explores</b>, says which results hold up and which do not, and designs the tests the full dataset (193 people) could run. It is the starting material for a Bernstein Conference poster.</p>
+  <div class="board" id="board">
+    <div class="card"><span class="pill yes" data-l="es">listo · revisado</span><span class="pill yes" data-l="en">done · revised</span><b data-l="es">5 hipótesis, 1 persona</b><b data-l="en">5 hypotheses, 1 person</b><p data-l="es">Crosstalk, subespacio de comunicación, alineación, sinergias, transferencia. Dos resultados corregidos tras añadir controles (capítulos 2 y 3).</p><p data-l="en">Crosstalk, communication subspace, alignment, synergies, transfer. Two results corrected after adding controls (chapters 2 and 3).</p></div>
+    <div class="card" id="st-cross"><span class="pill yes" data-l="es">listo · 12 personas</span><span class="pill yes" data-l="en">done · 12 people</span><b data-l="es">Invarianza entre personas</b><b data-l="en">Cross-user invariance</b><p data-l="es">¿La pose comparte subespacio entre personas y la EMG no?</p><p data-l="en">Is the pose subspace shared across people while the EMG is not?</p></div>
+    <div class="card" id="st-coh"><span class="pill open" data-l="es">listo · ambiguo</span><span class="pill open" data-l="en">done · ambiguous</span><b data-l="es">Coherencia intermuscular</b><b data-l="en">Intermuscular coherence</b><p data-l="es">¿Hay un mando neural compartido a 8-30 Hz dentro de cada sinergia?</p><p data-l="en">Is there shared 8-30 Hz neural drive within each synergy?</p></div>
+    <div class="card" id="st-net"><span class="pill yes" data-l="es">listo</span><span class="pill yes" data-l="en">done</span><b data-l="es">Dentro de la red de Meta</b><b data-l="en">Inside Meta’s network</b><p data-l="es">¿Su representación interna también tiene pocas dimensiones y está alineada con las sinergias?</p><p data-l="en">Is its internal representation also low-dimensional and aligned with the synergies?</p></div>
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="ch" id="crosstalk">
+  <p class="eyebrow" data-l="es">H1 · capítulo 1</p><p class="eyebrow" data-l="en">H1 · chapter 1</p>
+  <h2 data-l="es">La trampa del crosstalk</h2><h2 data-l="en">The crosstalk trap</h2>
+  <p data-l="es">Si la EMG tiene pocas dimensiones, ¿es porque el cerebro manda pocas órdenes? No tan rápido. Dos electrodos vecinos oyen en parte las mismas motor units (la electricidad se propaga por el tejido: <b>crosstalk</b>). Así que los 16 canales estarían correlacionados <b>aunque cada músculo se controlara por separado</b>.</p>
+  <p data-l="en">If the EMG is low-dimensional, is it because the brain sends few commands? Not so fast. Two neighbouring electrodes partly hear the same motor units (electricity spreads through tissue: <b>crosstalk</b>). So the 16 channels would be correlated <b>even if each muscle were controlled independently</b>.</p>
+  <p data-l="es"><b>Truco:</b> medir dos cosas con la misma regla. La señal <b>cruda</b> (120-250 Hz) solo se parece entre electrodos si comparten fuentes, porque los disparos de motor units distintas no van sincronizados: eso mide el crosstalk. Las <b>envolventes</b> (cuánta actividad hay) se parecen también si los músculos suben y bajan juntos porque reciben la misma orden.</p>
+  <p data-l="en"><b>Trick:</b> measure two things with the same ruler. The <b>raw</b> signal (120-250 Hz) only looks alike across electrodes if they share sources, because spikes of different motor units are not synchronised: that measures crosstalk. The <b>envelopes</b> (how much activity) also look alike when muscles rise and fall together because they receive the same command.</p>
+  <div class="lab">
+    <p class="lab-title" data-l="es">Correlación entre los 16 electrodos</p><p class="lab-title" data-l="en">Correlation between the 16 electrodes</p>
+    <p class="lab-sub" data-l="es">Datos reales. Cambia entre señal cruda y envolventes. Pasa el ratón por una celda.</p><p class="lab-sub" data-l="en">Real data. Switch between raw signal and envelopes. Hover over a cell.</p>
+    <div class="controls"><div class="seg" id="h1Sel" role="group" aria-label="Signal"><button type="button" data-v="raw" aria-pressed="true"><span data-l="es">señal cruda</span><span data-l="en">raw signal</span></button><button type="button" data-v="env" aria-pressed="false"><span data-l="es">envolventes</span><span data-l="en">envelopes</span></button></div></div>
+    <div class="two">
+      <svg class="chart" id="h1Mat" viewBox="0 0 340 340" role="img" aria-label="16 by 16 correlation matrix"></svg>
+      <svg class="chart" id="h1Cum" viewBox="0 0 380 300" role="img" aria-label="Cumulative variance curves"></svg>
+    </div>
+    <div class="legend"><span style="--c:var(--grey)" data-l="es">señal cruda (solo crosstalk)</span><span style="--c:var(--grey)" data-l="en">raw signal (crosstalk only)</span><span style="--c:var(--s1)" data-l="es">envolventes (crosstalk + orden compartida)</span><span style="--c:var(--s1)" data-l="en">envelopes (crosstalk + shared command)</span><span style="--c:var(--ink-3)" data-l="es">16 canales independientes</span><span style="--c:var(--ink-3)" data-l="en">16 independent channels</span></div>
+    <div class="readout" id="h1Read"></div>
+  </div>
+  <p data-l="es"><b>Resultado:</b> la señal cruda tiene ~7,5 dimensiones efectivas; las envolventes, ~2,7. La actividad se co-modula mucho más de lo que explica el crosstalk: <span class="pill yes">H1 apoyada</span>. <b>Pero</b> gran parte es un único componente global (esfuerzo total), y podría incluir derivas lentas compartidas como el contacto del electrodo.</p>
+  <p data-l="en"><b>Result:</b> the raw signal has ~7.5 effective dimensions; the envelopes ~2.7. Activity is co-modulated far beyond what crosstalk explains: <span class="pill yes">H1 supported</span>. <b>But</b> much of it is a single global component (overall effort), which could include slow shared drifts such as electrode contact.</p>
+</section>
+
+<!-- 2 -->
+<section class="ch" id="subespacio">
+  <p class="eyebrow" data-l="es">H2 · capítulo 2</p><p class="eyebrow" data-l="en">H2 · chapter 2</p>
+  <h2 data-l="es">El subespacio de comunicación</h2><h2 data-l="en">The communication subspace</h2>
+  <p data-l="es">Imagina que la EMG solo pudiera hablarle a la mano a través de <b>r cables</b>. Un decodificador normal usa todos los cables que quiera (80 entradas → 20 ángulos). La <b>regresión de rango reducido</b> (RRR) obliga a pasar por r. Si con 3 cables ya funciona casi igual, la información útil viaja por un canal estrecho. Semedo y colegas (2019) usaron este método para mostrar que dos áreas de la corteza visual se hablan por un “subespacio de comunicación” de pocas dimensiones.</p>
+  <p data-l="en">Imagine the EMG could only talk to the hand through <b>r wires</b>. A normal decoder uses as many wires as it likes (80 inputs → 20 angles). <b>Reduced-rank regression</b> (RRR) forces it through r. If 3 wires already work almost as well, the useful information travels through a narrow channel. Semedo and colleagues (2019) used this method to show that two visual cortical areas talk through a low-dimensional “communication subspace”.</p>
+  <div class="lab">
+    <p class="lab-title" data-l="es">¿Cuántos cables hacen falta?</p><p class="lab-title" data-l="en">How many wires are needed?</p>
+    <p class="lab-sub" data-l="es">R² con validación cruzada. Azul: los r cables los elige la EMG (RRR). Naranja: los r cables son las primeras r PCs de la pose (el bottleneck PCA del proyecto).</p><p class="lab-sub" data-l="en">Cross-validated R². Blue: the r wires are chosen using the EMG (RRR). Orange: the r wires are the first r pose PCs (the project’s PCA bottleneck).</p>
+    <div class="controls">
+      <div class="seg" id="h2Sel" role="group" aria-label="Target"><button type="button" data-v="position" aria-pressed="true"><span data-l="es">posición</span><span data-l="en">position</span></button><button type="button" data-v="velocity" aria-pressed="false"><span data-l="es">velocidad</span><span data-l="en">velocity</span></button><button type="button" data-v="equal" aria-pressed="false"><span data-l="es">8 PCs con igual peso</span><span data-l="en">8 PCs, equal weight</span></button></div>
+      <label for="h2R"><span data-l="es">rango r</span><span data-l="en">rank r</span> <input id="h2R" type="range" min="0" max="13" value="2"><output id="h2Ro">3</output></label>
+    </div>
+    <svg class="chart" id="h2Svg" viewBox="0 0 760 300" role="img" aria-label="R squared versus rank"></svg>
+    <div class="legend"><span style="--c:var(--s1)">RRR</span><span style="--c:var(--s2)" data-l="es">bottleneck PCA</span><span style="--c:var(--s2)" data-l="en">PCA bottleneck</span><span style="--c:var(--ink)" data-l="es">sin restricción</span><span style="--c:var(--ink)" data-l="en">unrestricted</span></div>
+    <div class="readout" id="h2Read"></div>
+  </div>
+  <p data-l="es"><b>Resultado:</b> midiendo en grados, con rango 3 se obtiene el 90 % de lo que da el decodificador sin restricción (rango 2 para velocidad), y el bottleneck PCA necesita solo una dimensión más.</p>
+  <p data-l="en"><b>Result:</b> measured in degrees, rank 3 gives 90 % of what the unrestricted decoder achieves (rank 2 for velocity), and the PCA bottleneck needs only one more dimension.</p>
+  <div class="honest"><span class="tag" data-l="es">corregido tras un control</span><span class="tag" data-l="en">corrected after a control</span>
+    <p data-l="es">En grados, la PC1 tiene más de la mitad de la varianza, así que “con 3 basta” dice en parte “la PC1 domina la escala”. Con las 8 primeras PCs <b>pesando igual</b> (botón de arriba) hacen falta <b>6 de 8</b> dimensiones. La decodificación es real (R² 0,17 frente a 0,01 con una entrada nula), pero la información está repartida. Veredicto: <span class="pill yes">sirve para la métrica del benchmark</span> (elegir k), <span class="pill no">no como afirmación neural</span> de un canal de 3 dimensiones.</p>
+    <p data-l="en">In degrees, PC1 holds more than half the variance, so “3 is enough” partly says “PC1 dominates the scale”. With the first 8 PCs <b>weighted equally</b> (button above) it takes <b>6 of 8</b> dimensions. The decoding is real (R² 0.17 versus 0.01 with a null input), but the information is spread out. Verdict: <span class="pill yes">holds for the benchmark metric</span> (choosing k), <span class="pill no">not as a neural claim</span> of a 3-D channel.</p></div>
+</section>
+
+<!-- 3 -->
+<section class="ch" id="alineado">
+  <p class="eyebrow" data-l="es">H3 · capítulo 3</p><p class="eyebrow" data-l="en">H3 · chapter 3</p>
+  <h2 data-l="es">¿Los cables son las sinergias de la pose?</h2><h2 data-l="en">Are the wires the pose synergies?</h2>
+  <p data-l="es">La RRR elige las direcciones de la pose que la EMG predice mejor. La PCA elige las direcciones en las que la pose varía más (las sinergias). ¿Son las mismas? Medimos cuánto se solapan los dos subespacios: 1 = idénticos, r/20 = como al azar.</p>
+  <p data-l="en">RRR picks the pose directions the EMG predicts best. PCA picks the directions in which the pose varies most (the synergies). Are they the same? We measure how much the two subspaces overlap: 1 = identical, r/20 = like random.</p>
+  <div class="lab">
+    <p class="lab-title" data-l="es">Solapamiento y composición</p><p class="lab-title" data-l="en">Overlap and composition</p>
+    <p class="lab-sub" data-l="es">Izquierda: solapamiento según la dimensión; azul = EMG real, gris = entrada nula. Derecha: de qué PCs está hecha cada dirección decodificable (más oscuro = más peso).</p><p class="lab-sub" data-l="en">Left: overlap by dimension; blue = real EMG, grey = null input. Right: which PCs each decodable direction is made of (darker = more weight).</p>
+    <div class="two">
+      <svg class="chart" id="h3Ov" viewBox="0 0 380 280" role="img" aria-label="Subspace overlap by dimension"></svg>
+      <svg class="chart" id="h3Comp" viewBox="0 0 380 280" role="img" aria-label="Composition of decodable directions in terms of pose PCs"></svg>
+    </div>
+  </div>
+  <p data-l="es"><b>Resultado aparente:</b> solapamiento 0,8-0,9 a partir de r = 3.</p>
+  <p data-l="en"><b>Apparent result:</b> overlap 0.8-0.9 from r = 3 on.</p>
+  <div class="honest"><span class="tag" data-l="es">un resultado que no sobrevivió</span><span class="tag" data-l="en">a result that did not survive</span>
+    <p data-l="es">La curva gris es el mismo análisis con una <b>entrada nula</b> (la EMG desplazada en el tiempo, sin relación instante a instante con la pose): ya da 0,98 en r = 1 y 0,5-0,8 después. Una regresión medida en grados se inclina hacia las direcciones de mucha varianza sea cual sea la entrada. La EMG real queda solo un poco por encima. Veredicto: <span class="pill open">no informativo tal como se midió</span>. Hace falta medir en unidades blanqueadas y contra una distribución nula (lo hace el análisis de la red, dirección C). La evidencia más limpia sobre qué ve la EMG es el R² por PC: la PC1 muy bien, las demás poco.</p>
+    <p data-l="en">The grey curve is the same analysis with a <b>null input</b> (EMG shifted in time, with no moment-to-moment link to the pose): it already gives 0.98 at r = 1 and 0.5-0.8 beyond. A regression measured in degrees leans towards high-variance directions whatever the input. The real EMG is only a little above it. Verdict: <span class="pill open">not informative as measured</span>. It needs whitened units and a null distribution (the network analysis, direction C, does this). The cleanest evidence about what the EMG sees is the per-PC R²: PC1 very well, the others weakly.</p></div>
+</section>
+
+<!-- 4 -->
+<section class="ch" id="sinergias">
+  <p class="eyebrow" data-l="es">H4 · capítulo 4</p><p class="eyebrow" data-l="en">H4 · chapter 4</p>
+  <h2 data-l="es">Sinergias musculares, y un resultado que no aguantó</h2><h2 data-l="en">Muscle synergies, and a result that did not survive</h2>
+  <p data-l="es">Las <b>sinergias musculares</b> se buscan con NMF: la EMG se escribe como suma de unos pocos patrones espaciales (qué electrodos trabajan juntos) por su activación en el tiempo. Cinco sinergias explican ~90 % de la EMG. Si el cerebro mandara la mano con esas 5 órdenes, sus activaciones deberían predecir la pose tan bien como los 16 canales.</p>
+  <p data-l="en"><b>Muscle synergies</b> are found with NMF: the EMG is written as a sum of a few spatial patterns (which electrodes work together) times their activation over time. Five synergies explain ~90 % of the EMG. If the brain drove the hand with those 5 commands, their activations should predict the pose as well as the 16 channels.</p>
+  <div class="lab">
+    <p class="lab-title" data-l="es">16 canales contra 5 sinergias</p><p class="lab-title" data-l="en">16 channels versus 5 synergies</p>
+    <p class="lab-sub" data-l="es">R² al decodificar cada PC de la pose. Pasa el ratón por las barras.</p><p class="lab-sub" data-l="en">R² when decoding each pose PC. Hover over the bars.</p>
+    <svg class="chart" id="h4Svg" viewBox="0 0 760 240" role="img" aria-label="Decoding R squared from 16 channels and from 5 synergies"></svg>
+    <div class="legend"><span style="--c:var(--grey)" data-l="es">16 canales</span><span style="--c:var(--grey)" data-l="en">16 channels</span><span style="--c:var(--s1)" data-l="es">5 sinergias</span><span style="--c:var(--s1)" data-l="en">5 synergies</span></div>
+  </div>
+  <p data-l="es"><b>Resultado:</b> las 5 sinergias conservan solo la mitad de la información de la pose: <span class="pill no">H4 no apoyada</span>. La estructura que domina la señal muscular no es todo lo que necesita la pose.</p>
+  <p data-l="en"><b>Result:</b> the 5 synergies keep only half of the pose information: <span class="pill no">H4 not supported</span>. The structure that dominates the muscle signal is not everything the pose needs.</p>
+  <div class="honest">
+    <span class="tag" data-l="es">un resultado que no sobrevivió</span><span class="tag" data-l="en">a result that did not survive</span>
+    <p data-l="es">Primera idea: la mayor parte de la EMG sería <b>co-contracción</b> (flexores y extensores a la vez, para dar rigidez), que no mueve nada. Un primer análisis lo parecía confirmar: las direcciones que usa el decodificador solo contenían el <b>7 %</b> de la varianza de la EMG.</p>
+    <p data-l="en">First idea: most of the EMG would be <b>co-contraction</b> (flexors and extensors together, to stiffen the hand), which moves nothing. A first analysis seemed to confirm it: the directions the decoder uses held only <b>7 %</b> of the EMG variance.</p>
+    <p data-l="es">Pero los pesos de una regresión apuntan por construcción a direcciones de poca varianza (la regresión divide por la covarianza de las entradas). Al comprobarlo desde el otro lado, prediciendo cada componente de la EMG a partir del movimiento, el movimiento explica más o menos lo mismo de todos (R² ≈ 0,2-0,3). Lo que sí aguanta: <b>solo ~1/4 de la varianza de la EMG lo explica el movimiento de los dedos</b>. El resto (co-contracción, muñeca, fuerza sin movimiento, ruido) no se puede separar con estos datos.</p>
+    <p data-l="en">But regression weights point to low-variance directions by construction (a regression divides by the input covariance). Checking from the other side, predicting each EMG component from the movement, the movement explains roughly the same share of every component (R² ≈ 0.2-0.3). What does hold: <b>only ~1/4 of the EMG variance is explained by finger movement</b>. The rest (co-contraction, wrist, force without movement, noise) cannot be separated with this data.</p>
+  </div>
+  <div class="lab">
+    <p class="lab-title" data-l="es">Cuánto explica el movimiento de cada componente de la EMG</p><p class="lab-title" data-l="en">How much of each EMG component the movement explains</p>
+    <svg class="chart" id="potSvg" viewBox="0 0 760 220" role="img" aria-label="Share of EMG variance and R squared from kinematics per EMG principal component"></svg>
+    <div class="legend"><span style="--c:var(--grey)" data-l="es">% de la varianza de la EMG</span><span style="--c:var(--grey)" data-l="en">% of EMG variance</span><span style="--c:var(--s1)" data-l="es">R² desde el movimiento</span><span style="--c:var(--s1)" data-l="en">R² from the movement</span></div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="ch" id="compartidas">
+  <p class="eyebrow" data-l="es">H5 · capítulo 5</p><p class="eyebrow" data-l="en">H5 · chapter 5</p>
+  <h2 data-l="es">¿Sinergias compartidas entre tareas y manos?</h2><h2 data-l="en">Synergies shared across tasks and hands?</h2>
+  <p data-l="es">Si las sinergias son un vocabulario neural fijo, deberían reutilizarse en tareas distintas. Las aprendemos con todas las tareas menos una y las probamos en la que falta. Y comparamos las de la mano izquierda con las de la derecha.</p>
+  <p data-l="en">If synergies are a fixed neural vocabulary, they should be reused across tasks. We learn them on all tasks but one and test them on the missing one. And we compare left-hand and right-hand synergies.</p>
+  <div class="lab">
+    <p class="lab-title" data-l="es">Mano izquierda contra derecha</p><p class="lab-title" data-l="en">Left hand versus right hand</p>
+    <p class="lab-sub" data-l="es">Cada anillo es la muñeca (0-7 palma, 8-15 dorso). Naranja: izquierda. Azul: derecha.</p><p class="lab-sub" data-l="en">Each ring is the wrist (0-7 palm, 8-15 back). Orange: left. Blue: right.</p>
+    <svg class="chart" id="h5Hands" viewBox="0 0 760 230" role="img" aria-label="Four matched synergies for left and right hands"></svg>
+    <div class="readout" id="h5Read"></div>
+  </div>
+  <div class="lab">
+    <p class="lab-title" data-l="es">¿Sirven en una tarea nueva?</p><p class="lab-title" data-l="en">Do they work on a new task?</p>
+    <p class="lab-sub" data-l="es">Varianza explicada (VAF) en la tarea que falta: con sus propias sinergias (gris) y con las aprendidas en las demás (azul).</p><p class="lab-sub" data-l="en">Variance accounted for (VAF) on the held-out task: with its own synergies (grey) and with those learned on the others (blue).</p>
+    <svg class="chart" id="h5Tr" viewBox="0 0 760 360" role="img" aria-label="Variance accounted for per held-out task"></svg>
+  </div>
+  <p data-l="es"><b>Resultado:</b> se transfieren bien (0,91 frente a 0,95) y son casi idénticas en las dos manos (0,98 frente a 0,60 al azar). <span class="pill open">compatible, no concluyente</span>: la anatomía (qué músculo hay bajo cada electrodo) predice exactamente lo mismo.</p>
+  <p data-l="en"><b>Result:</b> they transfer well (0.91 versus 0.95) and are nearly identical on both hands (0.98 versus 0.60 by chance). <span class="pill open">consistent, not conclusive</span>: anatomy (which muscle lies under each electrode) predicts exactly the same.</p>
+</section>
+
+<!-- 6 -->
+<section class="ch" id="resumen">
+  <p class="eyebrow" data-l="es">capítulo 6</p><p class="eyebrow" data-l="en">chapter 6</p>
+  <h2 data-l="es">Qué dicen los datos (por ahora, tras los controles)</h2><h2 data-l="en">What the data say (so far, after controls)</h2>
+  <div class="tablewrap"><table class="t">
+    <tr><th></th><th data-l="es">hipótesis</th><th data-l="en">hypothesis</th><th data-l="es">estado</th><th data-l="en">status</th></tr>
+    <tr><td>H1</td><td data-l="es">la EMG se co-modula más allá del crosstalk</td><td data-l="en">EMG is co-modulated beyond crosstalk</td><td><span class="pill yes" data-l="es">apoyada</span><span class="pill yes" data-l="en">supported</span></td></tr>
+    <tr><td>H2</td><td data-l="es">EMG → pose pasa por un subespacio de ~3 dimensiones</td><td data-l="en">EMG → pose flows through a ~3-D subspace</td><td><span class="pill open" data-l="es">solo en grados (6 de 8 con igual peso)</span><span class="pill open" data-l="en">only in degrees (6 of 8 with equal weight)</span></td></tr>
+    <tr><td>H3</td><td data-l="es">ese subespacio son las sinergias posturales</td><td data-l="en">that subspace is the postural synergies</td><td><span class="pill open" data-l="es">no informativo (falla el control)</span><span class="pill open" data-l="en">not informative (fails the control)</span></td></tr>
+    <tr><td>A</td><td data-l="es">la pose comparte subespacio entre personas; la EMG no</td><td data-l="en">pose shares a subspace across people; EMG does not</td><td><span class="pill yes" data-l="es">apoyada (12 personas)</span><span class="pill yes" data-l="en">supported (12 people)</span></td></tr>
+    <tr><td>B</td><td data-l="es">mando neural compartido dentro de cada sinergia (coherencia)</td><td data-l="en">shared neural drive within each synergy (coherence)</td><td><span class="pill open" data-l="es">exceso real, sin pico 8-30 Hz</span><span class="pill open" data-l="en">real excess, no 8-30 Hz bump</span></td></tr>
+    <tr><td>C</td><td data-l="es">la información de la pose no está en la parte dominante (EMG y red)</td><td data-l="en">pose information is not in the dominant part (EMG and network)</td><td><span class="pill yes" data-l="es">apoyada</span><span class="pill yes" data-l="en">supported</span></td></tr>
+    <tr><td>H4</td><td data-l="es">5 sinergias musculares llevan toda la información de la pose</td><td data-l="en">5 muscle synergies carry all the pose information</td><td><span class="pill no" data-l="es">no apoyada</span><span class="pill no" data-l="en">not supported</span></td></tr>
+    <tr><td>H5</td><td data-l="es">sinergias compartidas entre tareas y manos</td><td data-l="en">synergies shared across tasks and hands</td><td><span class="pill open" data-l="es">no concluyente</span><span class="pill open" data-l="en">not conclusive</span></td></tr>
+  </table></div>
+  <div class="callout">
+    <p data-l="es"><b>La historia que sobrevive:</b> las sinergias de la <b>pose</b> se comparten entre personas (y siguen a la tarea), mientras que los patrones de <b>EMG</b> son de cada persona. Y la estructura dominante de la señal muscular (las sinergias que más varianza explican, y también la parte dominante de la red de Meta) <b>no</b> es donde está la mayor parte de la información de la postura. Para el proyecto: un latente de pose aprendido con muchas personas se reutiliza casi gratis en una nueva; lo que hay que aprender por persona es la correspondencia EMG → latente.</p>
+    <p data-l="en"><b>The story that survives:</b> <b>pose</b> synergies are shared across people (and follow the task), while <b>EMG</b> patterns are person-specific. And the dominant structure of the muscle signal (the synergies that explain most of the variance, and also the dominant part of Meta’s network) is <b>not</b> where most of the posture information lives. For the project: a pose latent learned from many people is reused almost for free on a new one; what has to be learned per person is the EMG → latent mapping.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="ch" id="direcciones">
+  <p class="eyebrow" data-l="es">capítulo 7</p><p class="eyebrow" data-l="en">chapter 7</p>
+  <h2 data-l="es">Otras direcciones</h2><h2 data-l="en">Other directions</h2>
+  <p data-l="es">Tres preguntas que pueden separar mejor “neural” de “anatómico”, cada una en su propio notebook: <code>cross_user_invariance</code>, <code>intermuscular_coherence</code> y <code>network_internals</code>.</p>
+  <p data-l="en">Three questions that can better separate “neural” from “anatomical”, each in its own notebook: <code>cross_user_invariance</code>, <code>intermuscular_coherence</code> and <code>network_internals</code>.</p>
+  <h3 data-l="es">A. Invarianza entre personas</h3><h3 data-l="en">A. Cross-user invariance</h3>
+  <p data-l="es"><b>Pregunta:</b> ¿las sinergias de la pose son las mismas en personas distintas, mientras que los patrones de EMG cambian con la anatomía y la colocación de la pulsera? Si es así, comprimir la pose ayudaría justo a generalizar a gente nueva. Necesita varias personas: bajamos una parte del dataset completo.</p>
+  <p data-l="en"><b>Question:</b> are the pose synergies the same across people, while EMG patterns change with anatomy and band placement? If so, compressing the pose would help precisely with generalizing to new people. It needs several people: we downloaded part of the full dataset.</p>
+  <div id="res-cross" class="result">
+    <p data-l="es"><b>Datos:</b> 12 personas del dataset completo (4 de validación, 4 de test, 4 de entrenamiento), 13 tareas, ambas manos, 9 horas válidas. Bajamos solo esos archivos (11,5 GB) leyendo el índice del tar con peticiones parciales.</p>
+    <p data-l="en"><b>Data:</b> 12 people from the full dataset (4 validation, 4 test, 4 training), 13 tasks, both hands, 9 valid hours. We downloaded only those files (11.5 GB) by reading the tar index with range requests.</p>
+    <div class="tablewrap"><table class="t">
+      <tr><th></th><th data-l="es">pose</th><th data-l="en">pose</th><th>EMG</th></tr>
+      <tr><td data-l="es">solapamiento entre personas (3 PCs)</td><td data-l="en">overlap across people (3 PCs)</td><td>0,80</td><td>0,66</td></tr>
+      <tr><td data-l="es">misma persona, otra sesión</td><td data-l="en">same person, other session</td><td>0,93</td><td>0,94</td></tr>
+      <tr><td data-l="es">control estructurado (dedos cambiados / pulsera girada)</td><td data-l="en">structured null (fingers swapped / band rotated)</td><td>0,65</td><td>0,63</td></tr>
+      <tr><td data-l="es"><b>compartido más allá del control</b> (IC 95 %)</td><td data-l="en"><b>shared beyond the null</b> (95 % CI)</td><td><b>0,47</b> [0,34, 0,61]</td><td><b>0,07</b> [−0,04, 0,20]</td></tr>
+    </table></div>
+    <p data-l="es">La pose gana a la EMG en las 12 personas. Una base PCA de pose aprendida con las otras 11 cuesta solo <b>0,2-0,45°</b> más de error en una persona nueva (con k = 4: 9,0° frente a 8,6° usando su propia base). Y lo más llamativo: <b>el subespacio de la pose sigue a la tarea; el de la EMG sigue a la persona</b>.</p>
+    <p data-l="en">Pose beats EMG in all 12 people. A pose PCA basis learned from the other 11 costs only <b>0.2-0.45°</b> extra error on a new person (k = 4: 9.0° versus 8.6° with their own basis). And most striking: <b>the pose subspace follows the task; the EMG subspace follows the person</b>.</p>
+    <figure><img src="figs/cross_user_who_vs_what.png" alt="Bar chart: pose subspace overlap drops when the task changes, EMG subspace overlap drops when the person changes" loading="lazy" width="1700" height="610"><figcaption data-l="es">Solapamiento de subespacios (3 PCs). La pose cae al cambiar de tarea; la EMG cae al cambiar de persona.</figcaption><figcaption data-l="en">Subspace overlap (3 PCs). Pose drops when the task changes; EMG drops when the person changes.</figcaption></figure>
+    <figure><img src="figs/cross_user_louo.png" alt="Leave-one-user-out reconstruction: a pose basis from other users costs little; EMG transfers worse" loading="lazy" width="2540" height="640"><figcaption data-l="es">Reconstruir a una persona nueva con la base de las otras 11.</figcaption><figcaption data-l="en">Reconstructing a new person with the other 11 people’s basis.</figcaption></figure>
+    <p class="note" data-l="es"><b>Cuidado:</b> parte de lo compartido en la pose lo impone que todos hicieron los mismos gestos instruidos. No podemos separar anatomía de colocación de la pulsera. El rango 3 decodificable por persona está medido en grados (mismo sesgo que H2/H3).</p>
+    <p class="note" data-l="en"><b>Careful:</b> part of the pose sharing is imposed by everyone doing the same instructed gestures. We cannot separate anatomy from band placement. The per-person decodable rank of 3 is measured in degrees (same bias as H2/H3).</p>
+  </div>
+  <h3 data-l="es">B. Coherencia intermuscular</h3><h3 data-l="en">B. Intermuscular coherence</h3>
+  <p data-l="es"><b>Pregunta:</b> un mando neural compartido deja una huella: músculos que reciben la misma orden oscilan juntos a 8-30 Hz. El crosstalk no produce esa huella a esas frecuencias. ¿Los electrodos de una misma sinergia son más coherentes entre sí que los de sinergias distintas, a igual distancia?</p>
+  <p data-l="en"><b>Question:</b> shared neural drive leaves a fingerprint: muscles receiving the same command oscillate together at 8-30 Hz. Crosstalk does not produce that fingerprint at those frequencies. Are electrodes of the same synergy more coherent with each other than electrodes of different synergies, at the same distance?</p>
+  <div id="res-coh" class="result">
+    <p data-l="es"><b>Positivo pero ambiguo.</b> Los electrodos de una misma sinergia tienen claramente más coherencia que los de sinergias distintas a la misma distancia: +0,08 [0,02, 0,14], el mayor de las 660 formas posibles de partir el anillo en 4 sectores (p = 0,002). El crosstalk medido no lo explica (su índice apenas difiere: p = 0,25) y aguanta en cada mano por separado.</p>
+    <p data-l="en"><b>Positive but ambiguous.</b> Electrodes in the same synergy have clearly more coherence than electrodes in different synergies at the same distance: +0.08 [0.02, 0.14], the largest of all 660 ways of splitting the ring into 4 sectors (p = 0.002). Measured crosstalk does not explain it (its index barely differs: p = 0.25), and it holds for each hand separately.</p>
+    <p data-l="es"><b>Pero no hay pico a 8-30 Hz:</b> el exceso es plano de 1 a 45 Hz y desaparece hacia 100 Hz, y sale igual en movimientos lentos y rápidos. No parece el ritmo alfa/beta de un mando cortical. Quedan dos lecturas que estos datos no separan: un mando común de banda ancha a las motoneuronas de cada sector (neural, pero probablemente dentro de un mismo músculo), o crosstalk de motor units compartidas que la señal cruda subestima.</p>
+    <p data-l="en"><b>But there is no 8-30 Hz bump:</b> the excess is flat from 1 to 45 Hz, fades by 100 Hz, and is the same in slow and fast movements. It does not look like the alpha/beta rhythm of cortical drive. Two readings remain that this data cannot separate: broadband common input to the motor neurons of each sector (neural, but probably within one muscle), or crosstalk from shared motor units that the raw signal underestimates.</p>
+    <figure><img src="figs/coherence_within_between_spectra.png" alt="Coherence spectra of rectified EMG for within-synergy and between-synergy electrode pairs at ring distances 1 to 3, and the within-minus-between difference by frequency" loading="lazy" width="2721" height="626"><figcaption data-l="es">Azul: pares dentro de una sinergia; naranja: entre sinergias, a igual distancia. Derecha: la diferencia por frecuencia (sombreado gris = 8-30 Hz).</figcaption><figcaption data-l="en">Blue: pairs within a synergy; orange: between synergies, at equal distance. Right: the difference by frequency (grey band = 8-30 Hz).</figcaption></figure>
+    <p class="note" data-l="es"><b>Cuidado:</b> una persona, sin posturas realmente quietas (la mano casi nunca para en estas tareas), pocos pares por distancia. <b>La siguiente prueba más directa:</b> coherencia entre las dos manos, grabadas a la vez, que no pueden compartir crosstalk.</p>
+    <p class="note" data-l="en"><b>Careful:</b> one person, no truly still postures (the hand almost never stops in these tasks), few pairs per distance. <b>The most direct next test:</b> coherence between the two hands, recorded at the same time, which cannot share crosstalk.</p>
+  </div>
+  <h3 data-l="es">C. Dentro de la red de Meta</h3><h3 data-l="en">C. Inside Meta’s network</h3>
+  <p data-l="es"><b>Pregunta:</b> tratamos la red entrenada como si fuera una población de neuronas registrada. ¿Su representación interna (64 números a 25 Hz) también tiene pocas dimensiones? ¿Lo que lee de ella está alineado con las sinergias de la pose?</p>
+  <p data-l="en"><b>Question:</b> we treat the trained network as if it were a recorded neural population. Is its internal representation (64 numbers at 25 Hz) also low-dimensional? Is what it reads out aligned with the pose synergies?</p>
+  <div id="res-net" class="result">
+    <p data-l="es"><b>No es de pocas dimensiones.</b> Los 64 números internos tienen ~18-21 dimensiones efectivas (frente a 2,5 de las envolventes y 2,8 de la pose). El entrenamiento comprime (una red con pesos aleatorios da 48), pero la red <b>expande</b> la entrada unas 7 veces.</p>
+    <p data-l="en"><b>It is not low-dimensional.</b> The 64 internal numbers have ~18-21 effective dimensions (versus 2.5 for the envelopes and 2.8 for the pose). Training compresses (a random-weight network gives 48), but the network <b>expands</b> its input about 7-fold.</p>
+    <p data-l="es"><b>La pose vive en una parte pequeña que no es la de mucha varianza:</b> con las 3 PCs más grandes de la red se lee poca pose (R² 0,11-0,42); hacen falta 20-32. Solo ~25 % de la varianza interna la explica el movimiento de los dedos, igual que en la EMG. Es el mismo patrón que en H4.</p>
+    <p data-l="en"><b>The pose lives in a small part that is not the high-variance part:</b> the network’s 3 largest PCs read little pose (R² 0.11-0.42); 20-32 are needed. Only ~25 % of the internal variance is explained by finger movement, as in the EMG. It is the same pattern as H4.</p>
+    <p data-l="es"><b>Lo más útil para el proyecto:</b> una lectura lineal de la red de regresión, ajustada a esta persona, recupera las PCs 3-10 (R² 0,1-0,35) que el modelo completo no logra en esta persona nueva (≈ 0). La información está en el codificador; lo que falla entre personas es el decodificador. Eso apoya un latente compartido más una correspondencia ligera ajustada por persona.</p>
+    <p data-l="en"><b>Most useful for the project:</b> a linear readout of the regression network, fitted to this person, recovers PCs 3-10 (R² 0.1-0.35) that the end-to-end model misses on this new person (≈ 0). The information is in the encoder; what fails across people is the decoder. That supports a shared latent plus a light per-person mapping.</p>
+    <figure><img src="figs/network_dimensionality.png" alt="Cumulative variance of network features versus EMG envelopes and pose" loading="lazy" width="2090" height="660"><figcaption data-l="es">Dimensiones de la representación interna, comparadas con la EMG y la pose.</figcaption><figcaption data-l="en">Dimensions of the internal representation, compared with the EMG and the pose.</figcaption></figure>
+    <figure><img src="figs/network_readout.png" alt="Readout of pose from network features, per pose PC, compared with the end-to-end model" loading="lazy" width="2540" height="640"><figcaption data-l="es">Centro: R² por PC. Las líneas continuas (lectura lineal ajustada a la persona) superan a la discontinua naranja (modelo de regresión de Meta) en PC3-PC10.</figcaption><figcaption data-l="en">Middle: R² per PC. The solid lines (linear readout fitted to the person) beat the dashed orange (Meta’s regression model) on PC3-PC10.</figcaption></figure>
+    <p class="note" data-l="es"><b>Cuidado:</b> una persona, ~10 min; las lecturas lineales se calibran con esta persona (el modelo de Meta no); validación por bloques dentro de cada grabación.</p>
+    <p class="note" data-l="en"><b>Careful:</b> one person, ~10 min; the linear readouts are calibrated on this person (Meta’s model is not); blocked CV within each recording.</p>
+  </div>
+  <h3 data-l="es">D. Más adelante</h3><h3 data-l="en">D. Later</h3>
+  <p data-l="es">Coherencia entre las dos manos (grabadas a la vez: no comparten crosstalk); coordinación bimanual; repetir A con más personas y tareas no instruidas (FreeStyle); co-contracción con datos de fuerza, que emg2pose no tiene.</p>
+  <p data-l="en">Coherence between the two hands (recorded at the same time: no shared crosstalk); bimanual coordination; repeat A with more people and uninstructed tasks (FreeStyle); co-contraction with force data, which emg2pose does not have.</p>
+</section>
+
+<!-- 8 -->
+<section class="ch" id="validar">
+  <p class="eyebrow" data-l="es">capítulo 8</p><p class="eyebrow" data-l="en">chapter 8</p>
+  <h2 data-l="es">Cómo validarlo de verdad</h2><h2 data-l="en">How to validate it properly</h2>
+  <ol>
+    <li data-l="es"><b>Pre-registrar</b> hipótesis y métricas antes de tocar el dataset completo.</li><li data-l="en"><b>Pre-register</b> the hypotheses and metrics before touching the full dataset.</li>
+    <li data-l="es"><b>Por persona:</b> repetir H1-H5 en las personas de test. Un origen neural predice el mismo rango de comunicación en todos y un subespacio de pose compartido, aunque la EMG cambie.</li><li data-l="en"><b>Per person:</b> repeat H1-H5 on the test users. A neural origin predicts the same communication rank for everyone and a shared pose subspace, even if the EMG changes.</li>
+    <li data-l="es"><b>Un control para cada afirmación:</b> crosstalk (señal cruda), barajar canales, desplazar señales en el tiempo.</li><li data-l="en"><b>A control for every claim:</b> crosstalk (raw signal), channel shuffles, time-shifted signals.</li>
+    <li data-l="es"><b>Una huella que la anatomía no pueda imitar:</b> coherencia a 8-30 Hz entre grupos musculares durante posturas quietas (dirección B).</li><li data-l="en"><b>A fingerprint anatomy cannot mimic:</b> 8-30 Hz coherence between muscle groups during steady holds (direction B).</li>
+    <li data-l="es"><b>Un control biomecánico:</b> si las sinergias solo reflejan la tarea, las aprendidas en tareas de dedos sueltos deberían fallar en agarres de mano entera. Con 29 tareas y tareas reservadas, eso es una prueba real.</li><li data-l="en"><b>A biomechanical control:</b> if synergies only reflect the task, those learned on single-finger tasks should fail on whole-hand grasps. With 29 tasks and held-out tasks, this is a real test.</li>
+    <li data-l="es"><b>Volver al proyecto:</b> si el rango de comunicación es ~3-4 en todas las personas y está alineado con las PCs, el bottleneck PCA con k ≈ 4-8 queda justificado por la fisiología, no solo por las curvas de compresión.</li><li data-l="en"><b>Back to the project:</b> if the communication rank is ~3-4 for everyone and aligned with the PCs, a PCA bottleneck with k ≈ 4-8 is justified by physiology, not only by compression curves.</li>
+  </ol>
+</section>
+
+<!-- 9 -->
+<section class="ch" id="poster">
+  <p class="eyebrow" data-l="es">capítulo 9</p><p class="eyebrow" data-l="en">chapter 9</p>
+  <h2 data-l="es">Hacia un póster en Bernstein</h2><h2 data-l="en">Towards a Bernstein poster</h2>
+  <p data-l="es">Borrador en inglés (la conferencia es en inglés). Los huecos entre corchetes dependen del dataset completo. Las fechas de envío hay que mirarlas en la web de la conferencia.</p>
+  <p data-l="en">Draft in English. Bracketed gaps depend on the full dataset. Check the submission dates on the conference website.</p>
+  <div class="poster">
+    <h3>Shared postural synergies, person-specific muscle patterns: a basis for generalizable EMG-to-pose decoding</h3>
+    <p><b>Background.</b> Hand posture is low-dimensional (postural synergies), but whether this structure is shared across people, and how it relates to the muscle signal, matters both for theories of motor control and for decoders that must generalize to new users.</p>
+    <p><b>Methods.</b> Using wrist sEMG with simultaneous hand tracking (emg2pose), we compared pose and EMG subspaces across 12 people against structured nulls (swapped fingers, rotated band), controlled EMG dimensionality for electrode crosstalk, and analysed the internal representation of a pretrained EMG-to-pose network. [Extend to all held-out participants.]</p>
+    <p><b>Results.</b> Pose subspaces were shared across people well beyond the null (0.47 [0.34, 0.61]), EMG subspaces were not (0.07 [−0.04, 0.20]); pose structure followed the task, EMG structure followed the person. A pose basis from 11 people reconstructed a new person within 0.2-0.45° of their own basis. EMG envelopes were co-modulated beyond crosstalk (participation ratio 2.7 vs 7.5), yet their dominant synergies, like the dominant dimensions of the network, carried a minority of the posture information.</p>
+    <p><b>Conclusion.</b> A compact pose latent shared across people, with a person-specific mapping from muscle activity, is a principled route to EMG decoders that generalize. [Bottleneck decoding results from Stage 2.]</p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="ch" id="lecturas">
+  <p class="eyebrow" data-l="es">capítulo 10</p><p class="eyebrow" data-l="en">chapter 10</p>
+  <h2 data-l="es">Para leer</h2><h2 data-l="en">Reading</h2>
+  <ul class="reads">
+    <li><a href="https://scholar.google.com/scholar?q=Tresch+Jarc+2009+The+case+for+and+against+muscle+synergies" target="_blank" rel="noopener">Tresch & Jarc (2009). The case for and against muscle synergies</a> <span data-l="es">· el debate, corto</span><span data-l="en">· the debate, short</span></li>
+    <li><a href="https://scholar.google.com/scholar?q=Kutch+Valero-Cuevas+2012+Challenges+and+new+approaches+to+proving+the+existence+of+muscle+synergies+of+neural+origin" target="_blank" rel="noopener">Kutch & Valero-Cuevas (2012). Challenges and new approaches to proving the existence of muscle synergies of neural origin</a></li>
+    <li><a href="https://scholar.google.com/scholar?q=Semedo+2019+Cortical+areas+interact+through+a+communication+subspace" target="_blank" rel="noopener">Semedo et al. (2019). Cortical areas interact through a communication subspace</a> <span data-l="es">· el método de RRR</span><span data-l="en">· the RRR method</span></li>
+    <li><a href="https://scholar.google.com/scholar?q=Kaufman+2014+Cortical+activity+in+the+null+space+permitting+preparation+without+movement" target="_blank" rel="noopener">Kaufman et al. (2014). Cortical activity in the null space</a> <span data-l="es">· direcciones potentes y nulas</span><span data-l="en">· output-potent and null directions</span></li>
+    <li><a href="https://scholar.google.com/scholar?q=Farina+Negro+2015+Common+synaptic+input+to+motor+neurons+motor+unit+synchronization+and+force+control" target="_blank" rel="noopener">Farina & Negro (2015). Common synaptic input to motor neurons</a> <span data-l="es">· la huella de un mando compartido</span><span data-l="en">· the fingerprint of shared drive</span></li>
+    <li><a href="https://scholar.google.com/scholar?q=d%27Avella+Saltiel+Bizzi+2003+Combinations+of+muscle+synergies" target="_blank" rel="noopener">d’Avella, Saltiel & Bizzi (2003). Combinations of muscle synergies</a></li>
+    <li><a href="https://www.jneurosci.org/content/18/23/10105" target="_blank" rel="noopener">Santello, Flanders & Soechting (1998). Postural hand synergies for tool use</a></li>
+  </ul>
+  <p class="note" data-l="es">Notebooks: <code>neural_synergies</code>, <code>cross_user_invariance</code> (12 personas; necesita bajar sus datos con <code>scripts/partial_dataset/</code>), <code>intermuscular_coherence</code>, <code>network_internals</code>, en la rama <code>exploratory-analyses</code>. Salvo la dirección A, todo es con una persona: orientativo.</p>
+  <p class="note" data-l="en">Notebooks: <code>neural_synergies</code>, <code>cross_user_invariance</code> (12 people; download their data with <code>scripts/partial_dataset/</code>), <code>intermuscular_coherence</code>, <code>network_internals</code>, on branch <code>exploratory-analyses</code>. Except direction A, everything uses one person: indicative.</p>
+</section>
+</main>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+"use strict";
+let LANG = "es";
+const T = o => (o[LANG] != null ? o[LANG] : o.es);
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (x, d = 2) => { const s = x.toFixed(d); return LANG === "en" ? s : s.replace(".", ","); };
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function scale(d0, d1, r0, r1) { return v => r0 + (v - d0) / (d1 - d0) * (r1 - r0); }
+function axes(svg, o) {
+  svg.innerHTML = "";
+  const [W, H] = svg.getAttribute("viewBox").split(" ").slice(2).map(Number);
+  const m = Object.assign({ l: 46, r: 12, t: 12, b: 36 }, o.m || {});
+  const sx = scale(o.x[0], o.x[1], m.l, W - m.r), sy = scale(o.y[0], o.y[1], H - m.b, m.t);
+  const g = el("g", {}, svg);
+  (o.yticks || []).forEach(v => { el("line", { x1: m.l, x2: W - m.r, y1: sy(v), y2: sy(v), class: "grid" }, g); const t = el("text", { x: m.l - 6, y: sy(v) + 4, "text-anchor": "end" }, g); t.textContent = o.yfmt ? o.yfmt(v) : v; });
+  (o.xticks || []).forEach(v => { const t = el("text", { x: sx(v), y: H - m.b + 16, "text-anchor": "middle" }, g); t.textContent = o.xfmt ? o.xfmt(v) : v; });
+  el("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: "axis" }, g);
+  if (o.xlab) { const t = el("text", { x: (m.l + W - m.r) / 2, y: H - 4, "text-anchor": "middle" }, g); t.textContent = o.xlab; }
+  if (o.ylab) { const t = el("text", { x: 12, y: (m.t + H - m.b) / 2, "text-anchor": "middle", transform: `rotate(-90 12 ${(m.t + H - m.b) / 2})` }, g); t.textContent = o.ylab; }
+  return { sx, sy, g, W, H, m };
+}
+function path(pts) { let d = "", pen = false; for (const [x, y] of pts) { if (y == null || isNaN(y)) { pen = false; continue; } d += (pen ? "L" : "M") + x.toFixed(1) + "," + y.toFixed(1); pen = true; } return d; }
+function mix(c1, c2, t) { const p = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)); const a = p(c1), b = p(c2); return "#" + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, "0")).join(""); }
+const tip = $("#tip");
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.getAttribute("data-tip"); tip.hidden = false;
+  tip.style.left = Math.max(8, Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8)) + "px"; tip.style.top = (e.clientY + 14) + "px";
+});
+function seg(id, onChange) {
+  const box = document.getElementById(id);
+  box.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; $$("button", box).forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); onChange(b.dataset.v); });
+  return () => $("button[aria-pressed=true]", box).dataset.v;
+}
+const redrawers = [];
+const redraw = () => redrawers.forEach(f => f());
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
+new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+// language
+function setLang(l, store) {
+  LANG = l; document.documentElement.setAttribute("data-lang", l); document.documentElement.lang = l;
+  $$("#langSel button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === l ? "true" : "false"));
+  if (store) { try { localStorage.setItem("neuro-lang", l); } catch (e) {} }
+  redraw();
+}
+$("#langSel").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setLang(b.dataset.v, true); });
+(function () { let s = null; try { s = localStorage.getItem("neuro-lang"); } catch (e) {} if (!s) { try { s = localStorage.getItem("emg-guide-lang"); } catch (e) {} } setLang(s === "en" ? "en" : "es", false); })();
+// toc highlight
+(function () {
+  const links = $$("#toc a"); const map = new Map(links.map(a => [a.getAttribute("href").slice(1), a]));
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { links.forEach(a => a.classList.remove("on")); const a = map.get(e.target.id); if (a) a.classList.add("on"); } }), { rootMargin: "-40% 0px -55% 0px" });
+  $$("section.ch").forEach(s => io.observe(s));
+})();
+
+fetch("data.json").then(r => r.json()).then(D => {
+  // ---------------- H1
+  const getH1 = seg("h1Sel", drawH1);
+  function drawH1() {
+    const which = getH1(), M = which === "raw" ? D.C_raw : D.C_env;
+    const svg = $("#h1Mat"); svg.innerHTML = "";
+    const L = 26, S = (340 - L - 6) / 16, lo = tok("--surface-2"), hi = tok("--s1");
+    for (let i = 0; i < 16; i++) for (let j = 0; j < 16; j++) {
+      const v = Math.max(0, M[i][j]);
+      el("rect", { x: L + j * S, y: 4 + i * S, width: S - 1, height: S - 1, fill: mix(lo.length === 7 ? lo : "#EFEDF6", hi.length === 7 ? hi : "#2a78d6", v), "data-tip": `${T({ es: "canales", en: "channels" })} ${i} · ${j}: r = ${fmt(M[i][j], 2)}` }, svg);
+    }
+    [0, 4, 8, 12, 15].forEach(c => { const t = el("text", { x: L - 4, y: 4 + c * S + S * 0.7, "text-anchor": "end" }, svg); t.textContent = c; const t2 = el("text", { x: L + c * S + S / 2, y: 338, "text-anchor": "middle" }, svg); t2.textContent = c; });
+    const A = axes($("#h1Cum"), { x: [0.5, 16.5], y: [0, 100], xticks: [1, 4, 8, 12, 16], yticks: [0, 25, 50, 75, 100], yfmt: v => v + "%", xlab: T({ es: "número de componentes", en: "number of components" }), m: { l: 40 } });
+    el("path", { d: path(Array.from({ length: 16 }, (_, i) => [A.sx(i + 1), A.sy(100 * (i + 1) / 16)])), fill: "none", stroke: tok("--ink-3"), "stroke-dasharray": "3 4", "stroke-width": 1.5 }, A.g);
+    [["cum_raw", tok("--grey"), which === "raw"], ["cum_env", tok("--s1"), which === "env"]].forEach(([k, col, on]) => {
+      el("path", { d: path(D[k].map((y, i) => [A.sx(i + 1), A.sy(y)])), fill: "none", stroke: col, "stroke-width": on ? 3 : 1.6, opacity: on ? 1 : 0.6 }, A.g);
+      D[k].forEach((y, i) => el("circle", { cx: A.sx(i + 1), cy: A.sy(y), r: on ? 4 : 2.5, fill: col, "data-tip": `${i + 1}: ${fmt(y, 1)} %` }, A.g));
+    });
+    $("#h1Read").innerHTML = T({ es: `dimensiones efectivas (participation ratio): señal cruda <b>${fmt(D.pr_raw, 2)}</b> · envolventes <b>${fmt(D.pr_env, 2)}</b> · máximo posible 16`,
+      en: `effective dimensions (participation ratio): raw signal <b>${fmt(D.pr_raw, 2)}</b> · envelopes <b>${fmt(D.pr_env, 2)}</b> · maximum 16` });
+  }
+  drawH1(); redrawers.push(drawH1);
+
+  // ---------------- H2
+  const getH2 = seg("h2Sel", drawH2);
+  $("#h2R").addEventListener("input", drawH2);
+  function drawH2() {
+    const t = getH2();
+    if (t === "equal") { drawH2eq(); return; }
+    $("#h2R").max = 13;
+    const d = D.rrr[t], R = D.ranks, ri = Math.min(+$("#h2R").value, 13), r = R[ri];
+    $("#h2Ro").textContent = r;
+    const ymin = Math.floor(Math.min(...d.pca) * 50) / 50 - 0.01, ymax = d.full + 0.01;
+    const A = axes($("#h2Svg"), { x: [0, 21], y: [ymin, ymax], xticks: [1, 2, 3, 4, 6, 8, 10, 12, 16, 20], yticks: [ymin, (ymin + ymax) / 2, ymax].map(v => +v.toFixed(2)), yfmt: v => fmt(v, 2),
+      xlab: T({ es: "rango r (número de “cables”)", en: "rank r (number of “wires”)" }), ylab: "R²" });
+    el("line", { x1: A.sx(0.5), x2: A.sx(20.5), y1: A.sy(d.full), y2: A.sy(d.full), stroke: tok("--ink"), "stroke-dasharray": "6 4", "stroke-width": 1.5 }, A.g);
+    el("line", { x1: A.sx(0.5), x2: A.sx(20.5), y1: A.sy(0.9 * d.full), y2: A.sy(0.9 * d.full), stroke: tok("--ink-3"), "stroke-width": 1 }, A.g);
+    const t90 = el("text", { x: A.sx(20.5), y: A.sy(0.9 * d.full) - 4, "text-anchor": "end" }, A.g); t90.textContent = T({ es: "90 % del máximo", en: "90 % of maximum" });
+    [["pca", tok("--s2")], ["rrr", tok("--s1")]].forEach(([k, col]) => {
+      el("path", { d: path(R.map((x, i) => [A.sx(x), A.sy(d[k][i])])), fill: "none", stroke: col, "stroke-width": 2.5 }, A.g);
+      R.forEach((x, i) => el("circle", { cx: A.sx(x), cy: A.sy(d[k][i]), r: i === ri ? 7 : 4, fill: col, stroke: tok("--surface"), "stroke-width": 2, "data-tip": `r = ${x}: R² = ${fmt(d[k][i], 3)}` }, A.g));
+    });
+    el("line", { x1: A.sx(r), x2: A.sx(r), y1: A.sy(ymin), y2: A.sy(ymax), stroke: tok("--ink-3"), "stroke-dasharray": "2 3" }, A.g);
+    const pr = v => fmt(100 * v / d.full, 0);
+    $("#h2Read").innerHTML = T({ es: `con r = ${r}: RRR <b>${pr(d.rrr[ri])} %</b> del máximo · bottleneck PCA <b>${pr(d.pca[ri])} %</b> · máximo R² = ${fmt(d.full, 2)}`,
+      en: `with r = ${r}: RRR <b>${pr(d.rrr[ri])} %</b> of maximum · PCA bottleneck <b>${pr(d.pca[ri])} %</b> · maximum R² = ${fmt(d.full, 2)}` });
+  }
+  function drawH2eq() {
+    const e = D.rrr.equal, R = [1, 2, 3, 4, 5, 6, 7, 8], inp = $("#h2R"); inp.max = 7; if (+inp.value > 7) inp.value = 2;
+    const ri = +inp.value, r = R[ri]; $("#h2Ro").textContent = r;
+    const A = axes($("#h2Svg"), { x: [0.5, 8.5], y: [-0.02, 0.2], xticks: R, yticks: [0, 0.05, 0.1, 0.15, 0.2], yfmt: v => fmt(v, 2),
+      xlab: T({ es: "rango r (8 PCs con igual peso)", en: "rank r (8 PCs, equal weight)" }), ylab: "R²" });
+    el("line", { x1: A.sx(0.5), x2: A.sx(8.5), y1: A.sy(e.full), y2: A.sy(e.full), stroke: tok("--ink"), "stroke-dasharray": "6 4", "stroke-width": 1.5 }, A.g);
+    el("line", { x1: A.sx(0.5), x2: A.sx(8.5), y1: A.sy(0.9 * e.full), y2: A.sy(0.9 * e.full), stroke: tok("--ink-3"), "stroke-width": 1 }, A.g);
+    [["null", tok("--grey")], ["rrr", tok("--s1")]].forEach(([k, col]) => {
+      el("path", { d: path(R.map((x, i) => [A.sx(x), A.sy(e[k][i])])), fill: "none", stroke: col, "stroke-width": 2.5 }, A.g);
+      R.forEach((x, i) => el("circle", { cx: A.sx(x), cy: A.sy(e[k][i]), r: i === ri ? 7 : 4, fill: col, stroke: tok("--surface"), "stroke-width": 2, "data-tip": `r = ${x}: R² = ${fmt(e[k][i], 3)}${k === "null" ? " (" + T({ es: "entrada nula", en: "null input" }) + ")" : ""}` }, A.g));
+    });
+    el("line", { x1: A.sx(r), x2: A.sx(r), y1: A.sy(-0.02), y2: A.sy(0.2), stroke: tok("--ink-3"), "stroke-dasharray": "2 3" }, A.g);
+    $("#h2Read").innerHTML = T({ es: `con r = ${r}: <b>${fmt(100 * e.rrr[ri] / e.full, 0)} %</b> del máximo (R² ${fmt(e.full, 2)}) · entrada nula (gris): R² ${fmt(e.full_null, 3)} · hace falta r = 6 para el 90 %`,
+      en: `with r = ${r}: <b>${fmt(100 * e.rrr[ri] / e.full, 0)} %</b> of maximum (R² ${fmt(e.full, 2)}) · null input (grey): R² ${fmt(e.full_null, 3)} · r = 6 is needed for 90 %` });
+  }
+  drawH2(); redrawers.push(drawH2);
+
+  // ---------------- H3
+  function drawH3() {
+    const ks = Object.keys(D.overlap).map(Number), vs = ks.map(k => D.overlap[k]);
+    const A = axes($("#h3Ov"), { x: [0.5, 10.5], y: [0, 1], xticks: ks, yticks: [0, 0.25, 0.5, 0.75, 1], yfmt: v => fmt(v, 2), xlab: T({ es: "dimensión del subespacio r", en: "subspace dimension r" }), m: { l: 40 } });
+    el("path", { d: path(ks.map(k => [A.sx(k), A.sy(k / 20)])), fill: "none", stroke: tok("--ink-3"), "stroke-dasharray": "3 4", "stroke-width": 1.5 }, A.g);
+    const vn = ks.map(k => D.overlap_null[k]);
+    el("path", { d: path(ks.map((k, i) => [A.sx(k), A.sy(vn[i])])), fill: "none", stroke: tok("--grey"), "stroke-width": 2.5 }, A.g);
+    ks.forEach((k, i) => el("circle", { cx: A.sx(k), cy: A.sy(vn[i]), r: 4, fill: tok("--grey"), "data-tip": `r = ${k}: ${T({ es: "entrada nula", en: "null input" })} ${fmt(vn[i], 2)}` }, A.g));
+    el("path", { d: path(ks.map((k, i) => [A.sx(k), A.sy(vs[i])])), fill: "none", stroke: tok("--s1"), "stroke-width": 2.5 }, A.g);
+    ks.forEach((k, i) => el("circle", { cx: A.sx(k), cy: A.sy(vs[i]), r: 4.5, fill: tok("--s1"), "data-tip": `r = ${k}: ${T({ es: "solapamiento", en: "overlap" })} ${fmt(vs[i], 2)} (${T({ es: "azar", en: "random" })} ${fmt(k / 20, 2)})` }, A.g));
+    const tr = el("text", { x: A.sx(10.3), y: A.sy(0.5) + 18, "text-anchor": "end" }, A.g); tr.textContent = T({ es: "azar", en: "random" });
+    const svg = $("#h3Comp"); svg.innerHTML = "";
+    const L = 64, Tp = 10, cw = (380 - L - 8) / 10, ch = (280 - Tp - 44) / 6, lo = tok("--surface-2"), hi = tok("--s1");
+    for (let i = 0; i < 6; i++) {
+      const t = el("text", { x: L - 6, y: Tp + i * ch + ch * 0.62, "text-anchor": "end" }, svg); t.textContent = "RRR " + (i + 1);
+      for (let j = 0; j < 10; j++) { const v = D.composition[i][j]; el("rect", { x: L + j * cw, y: Tp + i * ch, width: cw - 2, height: ch - 2, rx: 2, fill: mix(lo, hi, Math.min(1, v)), "data-tip": `RRR ${i + 1} · PC${j + 1}: ${fmt(100 * v, 0)} %` }, svg); }
+    }
+    for (let j = 0; j < 10; j++) { const t = el("text", { x: L + j * cw + cw / 2, y: 280 - 26, "text-anchor": "middle" }, svg); t.textContent = "PC" + (j + 1); const t2 = el("text", { x: L + j * cw + cw / 2, y: 280 - 10, "text-anchor": "middle" }, svg); t2.textContent = Math.round(D.ev_pose[j]) + "%"; }
+  }
+  drawH3(); redrawers.push(drawH3);
+
+  // ---------------- H4 + pose-potent
+  function bars(svg, a, b, labels, cols, names, ymin, ymax, yfmtf, tipf) {
+    const A = axes(svg, { x: [0, labels.length], y: [ymin, ymax], yticks: [ymin, 0, (ymax) / 2, ymax].filter((v, i, s) => s.indexOf(v) === i && v >= ymin), yfmt: yfmtf, m: { l: 40, b: 28 } });
+    const bw = A.sx(1) - A.sx(0);
+    el("line", { x1: A.sx(0), x2: A.sx(labels.length), y1: A.sy(0), y2: A.sy(0), stroke: tok("--ink"), "stroke-width": 1 }, A.g);
+    labels.forEach((lab, i) => {
+      [[a[i], cols[0], 0.12, names[0]], [b[i], cols[1], 0.5, names[1]]].forEach(([v, col, off, nm]) => {
+        const y = A.sy(Math.max(v, 0)), h = Math.abs(A.sy(v) - A.sy(0));
+        el("rect", { x: A.sx(i) + bw * off, width: bw * 0.36, y, height: Math.max(h, 1), rx: 2, fill: col, "data-tip": tipf(lab, nm, v) }, A.g);
+      });
+      const t = el("text", { x: A.sx(i) + bw / 2, y: A.H - 10, "text-anchor": "middle" }, A.g); t.textContent = lab;
+    });
+  }
+  function drawH4() {
+    bars($("#h4Svg"), D.h4.ch16, D.h4.syn5, Array.from({ length: 8 }, (_, i) => "PC" + (i + 1)), [tok("--grey"), tok("--s1")],
+      [T({ es: "16 canales", en: "16 channels" }), T({ es: "5 sinergias", en: "5 synergies" })], -0.05, 0.5, v => fmt(v, 2), (l, n, v) => `${l} · ${n}: R² = ${fmt(v, 2)}`);
+    bars($("#potSvg"), D.pot.enc_var.map(v => v / 100), D.pot.enc_r2, Array.from({ length: 6 }, (_, i) => T({ es: "EMG PC", en: "EMG PC" }) + (i + 1)), [tok("--grey"), tok("--s1")],
+      [T({ es: "% de la varianza", en: "% of variance" }), "R²"], 0, 0.7, v => fmt(v, 1), (l, n, v) => `${l} · ${n}: ${n === "R²" ? fmt(v, 2) : fmt(100 * v, 0) + " %"}`);
+  }
+  drawH4(); redrawers.push(drawH4);
+
+  // ---------------- H5
+  function ring(svg, cx, cy, R, w, col, label) {
+    el("circle", { cx, cy, r: R, fill: "none", stroke: tok("--line") }, svg);
+    for (let c = 0; c < 16; c++) {
+      const a0 = Math.PI + c * 2 * Math.PI / 16, a1 = a0 + 2 * Math.PI / 16 * 0.85, v = Math.max(0, w[c]) / Math.max(...w);
+      const r = 6 + (R - 6) * v, p = (a, rr) => [cx + rr * Math.cos(a), cy - rr * Math.sin(a)];
+      const [x0, y0] = p(a0, 4), [x1, y1] = p(a0, r), [x2, y2] = p(a1, r), [x3, y3] = p(a1, 4);
+      el("path", { d: `M${x0},${y0}L${x1},${y1}A${r},${r} 0 0 0 ${x2},${y2}L${x3},${y3}Z`, fill: col, opacity: 0.9, "data-tip": `${label} · ${T({ es: "canal", en: "channel" })} ${c}: ${fmt(v, 2)}` }, svg);
+    }
+  }
+  function drawH5() {
+    const svg = $("#h5Hands"); svg.innerHTML = "";
+    for (let k = 0; k < 4; k++) {
+      const cx = 95 + k * 190;
+      ring(svg, cx - 45, 105, 40, D.hands.left[k], tok("--s2"), T({ es: "izquierda", en: "left" }) + ` ${k + 1}`);
+      ring(svg, cx + 45, 105, 40, D.hands.right[k], tok("--s1"), T({ es: "derecha", en: "right" }) + ` ${k + 1}`);
+      const t = el("text", { x: cx, y: 172, "text-anchor": "middle" }, svg); t.textContent = T({ es: "sinergia", en: "synergy" }) + ` ${k + 1}`;
+      const t2 = el("text", { x: cx, y: 190, "text-anchor": "middle" }, svg); t2.textContent = `cos = ${fmt(D.hands.cos[k], 2)}`;
+    }
+    const lab = el("text", { x: 380, y: 222, "text-anchor": "middle" }, svg); lab.textContent = T({ es: "palma abajo · dorso arriba · lado del meñique a la izquierda", en: "palm at the bottom · back at the top · little-finger side on the left" });
+    const mean = D.hands.cos.reduce((a, b) => a + b, 0) / D.hands.cos.length;
+    $("#h5Read").innerHTML = T({ es: `parecido medio entre manos <b>${fmt(mean, 2)}</b> · al azar (canales barajados) <b>${fmt(D.hands.null_mean, 2)}</b>, percentil 95: ${fmt(D.hands.null_p95, 2)}`,
+      en: `mean similarity between hands <b>${fmt(mean, 2)}</b> · by chance (shuffled channels) <b>${fmt(D.hands.null_mean, 2)}</b>, 95th percentile: ${fmt(D.hands.null_p95, 2)}` });
+    const tr = D.transfer, n = tr.stages.length, idx = tr.stages.map((_, i) => i).sort((a, b) => tr.other[a] - tr.other[b]);
+    const s2 = $("#h5Tr"); s2.innerHTML = "";
+    const L = 250, Rr = 750, rowH = (360 - 30) / n, sx = scale(0.7, 1, L, Rr);
+    [0.7, 0.8, 0.9, 1].forEach(v => { el("line", { x1: sx(v), x2: sx(v), y1: 4, y2: 360 - 26, class: "grid" }, s2); const t = el("text", { x: sx(v), y: 352, "text-anchor": "middle" }, s2); t.textContent = fmt(v, 1); });
+    idx.forEach((i, row) => {
+      const y = 6 + row * rowH;
+      const t = el("text", { x: L - 8, y: y + rowH * 0.62, "text-anchor": "end" }, s2); t.textContent = tr.stages[i].length > 34 ? tr.stages[i].slice(0, 33) + "…" : tr.stages[i];
+      el("rect", { x: L, y: y + 2, width: Math.max(0, sx(tr.own[i]) - L), height: rowH * 0.38, rx: 2, fill: tok("--grey"), "data-tip": `${tr.stages[i]} · ${T({ es: "propias", en: "own" })}: ${fmt(tr.own[i], 3)}` }, s2);
+      el("rect", { x: L, y: y + 2 + rowH * 0.42, width: Math.max(0, sx(tr.other[i]) - L), height: rowH * 0.38, rx: 2, fill: tok("--s1"), "data-tip": `${tr.stages[i]} · ${T({ es: "de otras tareas", en: "from other tasks" })}: ${fmt(tr.other[i], 3)}` }, s2);
+    });
+  }
+  drawH5(); redrawers.push(drawH5);
+}).catch(() => { $$(".readout").forEach(r => { r.textContent = T({ es: "No se pudieron cargar los datos. Recarga la página.", en: "The data could not be loaded. Reload the page." }); }); });
+
+</script>
