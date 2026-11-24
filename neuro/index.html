@@ -109,6 +109,16 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
   nav.rail a { white-space: nowrap; }
   .two { grid-template-columns: minmax(0, 1fr); }
 }
+
+.mathbox { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 18px; margin: 22px 0; }
+.mathbox .mb-title { font-family: var(--display); font-weight: 700; font-size: 17px; margin: 0 0 8px; }
+.mathbox .mb-title::before { content: "\2211  "; color: var(--accent); }
+.mathbox p, .mathbox li { font-size: 16px; }
+.md { overflow-x: auto; overflow-y: hidden; margin: 10px 0 14px; padding: 4px 0; max-width: 100%; }
+.md math { font-size: 1.1em; }
+.m math { font-size: 1.04em; }
+math { color: var(--ink); }
+.mathbox .mb-links { font-size: 14px; color: var(--ink-3); margin-bottom: 0; }
 </style>
 
 <div class="wrap">
@@ -180,6 +190,20 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
   </div>
   <p data-l="es"><b>Resultado:</b> la señal cruda tiene ~7,5 dimensiones efectivas; las envolventes, ~2,7. La actividad se co-modula mucho más de lo que explica el crosstalk: <span class="pill yes">H1 apoyada</span>. <b>Pero</b> gran parte es un único componente global (esfuerzo total), y podría incluir derivas lentas compartidas como el contacto del electrodo.</p>
   <p data-l="en"><b>Result:</b> the raw signal has ~7.5 effective dimensions; the envelopes ~2.7. Activity is co-modulated far beyond what crosstalk explains: <span class="pill yes">H1 supported</span>. <b>But</b> much of it is a single global component (overall effort), which could include slow shared drifts such as electrode contact.</p>
+<div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p>Con <span class="m">\mathbf R</span> la matriz de correlación 16 × 16 entre canales y <span class="m">\lambda_1,\dots,\lambda_{16}</span> sus autovalores, la dimensión efectiva es</p>
+<div class="md">\mathrm{PR} = \frac{\left(\sum_i \lambda_i\right)^2}{\sum_i \lambda_i^2} \in [1, 16]</div>
+<p><b>Por qué la señal cruda mide el crosstalk.</b> Cada canal es una mezcla de fuentes, <span class="m">x_c(t) = \sum_i a_{ic}\, u_i(t)</span>. Los disparos de motor units distintas no están sincronizados, así que <span class="m">u_i</span> y <span class="m">u_j</span> no se correlacionan y</p>
+<div class="md">\operatorname{cov}(x_c, x_d) = \sum_i a_{ic}\, a_{id}\, \operatorname{var}(u_i)</div>
+<p>Solo hay correlación si dos canales comparten fuentes (<span class="m">a_{ic} a_{id} \neq 0</span>): eso es el crosstalk. La envolvente mide la <i>intensidad</i> de disparo <span class="m">\rho_i(t)</span>, más o menos <span class="m">E_c(t) \approx \sum_i a_{ic}^2\, \rho_i(t)</span>. Si las intensidades suben y bajan juntas por una orden común, las envolventes se correlacionan <b>aunque no compartan fuentes</b>. Por eso <span class="m">\mathrm{PR}_{\text{env}} = 2{,}7 \ll \mathrm{PR}_{\text{cruda}} = 7{,}5</span> indica co-modulación.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=Gao+Ganguli+2015+On+simplicity+and+complexity+in+the+brave+new+world+of+large-scale+neuroscience" target="_blank" rel="noopener">Gao y Ganguli (2015), participation ratio</a> · <a href="https://scholar.google.com/scholar?q=Farina+Merletti+Enoka+2014+The+extraction+of+neural+strategies+from+the+surface+EMG+an+update" target="_blank" rel="noopener">Farina et al. (2014), crosstalk y amplitud</a></p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p>With <span class="m">\mathbf R</span> the 16 × 16 correlation matrix between channels and <span class="m">\lambda_1,\dots,\lambda_{16}</span> its eigenvalues, the effective dimension is</p>
+<div class="md">\mathrm{PR} = \frac{\left(\sum_i \lambda_i\right)^2}{\sum_i \lambda_i^2} \in [1, 16]</div>
+<p><b>Why the raw signal measures crosstalk.</b> Each channel is a mixture of sources, <span class="m">x_c(t) = \sum_i a_{ic}\, u_i(t)</span>. Spikes of different motor units are not synchronised, so <span class="m">u_i</span> and <span class="m">u_j</span> are uncorrelated and</p>
+<div class="md">\operatorname{cov}(x_c, x_d) = \sum_i a_{ic}\, a_{id}\, \operatorname{var}(u_i)</div>
+<p>Two channels correlate only if they share sources (<span class="m">a_{ic} a_{id} \neq 0</span>): that is crosstalk. The envelope measures the firing <i>intensity</i> <span class="m">\rho_i(t)</span>, roughly <span class="m">E_c(t) \approx \sum_i a_{ic}^2\, \rho_i(t)</span>. If intensities rise and fall together because of a common command, envelopes correlate <b>even without shared sources</b>. That is why <span class="m">\mathrm{PR}_{\text{env}} = 2.7 \ll \mathrm{PR}_{\text{raw}} = 7.5</span> indicates co-modulation.</p>
+<p class="mb-links">Further reading: <a href="https://scholar.google.com/scholar?q=Gao+Ganguli+2015+On+simplicity+and+complexity+in+the+brave+new+world+of+large-scale+neuroscience" target="_blank" rel="noopener">Gao & Ganguli (2015), participation ratio</a> · <a href="https://scholar.google.com/scholar?q=Farina+Merletti+Enoka+2014+The+extraction+of+neural+strategies+from+the+surface+EMG+an+update" target="_blank" rel="noopener">Farina et al. (2014), crosstalk and amplitude</a></p></div>
 </section>
 
 <!-- 2 -->
@@ -204,6 +228,22 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
   <div class="honest"><span class="tag" data-l="es">corregido tras un control</span><span class="tag" data-l="en">corrected after a control</span>
     <p data-l="es">En grados, la PC1 tiene más de la mitad de la varianza, así que “con 3 basta” dice en parte “la PC1 domina la escala”. Con las 8 primeras PCs <b>pesando igual</b> (botón de arriba) hacen falta <b>6 de 8</b> dimensiones. La decodificación es real (R² 0,17 frente a 0,01 con una entrada nula), pero la información está repartida. Veredicto: <span class="pill yes">sirve para la métrica del benchmark</span> (elegir k), <span class="pill no">no como afirmación neural</span> de un canal de 3 dimensiones.</p>
     <p data-l="en">In degrees, PC1 holds more than half the variance, so “3 is enough” partly says “PC1 dominates the scale”. With the first 8 PCs <b>weighted equally</b> (button above) it takes <b>6 of 8</b> dimensions. The decoding is real (R² 0.17 versus 0.01 with a null input), but the information is spread out. Verdict: <span class="pill yes">holds for the benchmark metric</span> (choosing k), <span class="pill no">not as a neural claim</span> of a 3-D channel.</p></div>
+<div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p><b>Regresión de rango reducido.</b> Con <span class="m">\mathbf X</span> (EMG: 16 canales × 5 retardos = 80 columnas) y <span class="m">\mathbf Y</span> (pose):</p>
+<div class="md">\hat{\mathbf B}_r = \arg\min_{\operatorname{rank}(\mathbf B)\le r} \|\mathbf Y - \mathbf X\mathbf B\|_F^2 = \hat{\mathbf B}\,\mathbf V_r\mathbf V_r^{\top}, \qquad \mathbf V_r = \text{primeros } r \text{ vectores singulares derechos de } \mathbf X\hat{\mathbf B}</div>
+<p>“Cuántos cables hacen falta”: <span class="m">r_{90} = \min\{\, r : R^2(r) \ge 0{,}9\, R^2(\text{sin restricción}) \,\}</span>.</p>
+<p><b>Grados contra pesos iguales.</b> El R² en grados suma errores de todas las direcciones de la pose, y cada PC pesa tanto como su varianza <span class="m">\lambda_k</span> (capítulo 8 de la guía). Para que todas pesen igual, se <i>blanquea</i> la pose: se pasa a PCs y se divide cada una por su desviación típica,</p>
+<div class="md">\mathbf Z = (\mathbf Y - \boldsymbol\mu)\,\mathbf V\,\boldsymbol\Lambda^{-1/2}</div>
+<p>y se repite la RRR con <span class="m">\mathbf Z</span>. Resultado: <span class="m">r_{90} = 3</span> en grados, pero <span class="m">r_{90} = 6</span> de 8 con <span class="m">\mathbf Z</span>. <b>Entrada nula:</b> <span class="m">\tilde{\mathbf X}</span> = la EMG desplazada media grabación respecto a la pose; da <span class="m">R^2 = 0{,}014</span> frente a 0,17.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=Semedo+2019+Cortical+areas+interact+through+a+communication+subspace" target="_blank" rel="noopener">Semedo et al. (2019)</a> · <a href="https://scholar.google.com/scholar?q=Izenman+1975+Reduced-rank+regression+for+the+multivariate+linear+model" target="_blank" rel="noopener">Izenman (1975)</a></p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p><b>Reduced-rank regression.</b> With <span class="m">\mathbf X</span> (EMG: 16 channels × 5 delays = 80 columns) and <span class="m">\mathbf Y</span> (pose):</p>
+<div class="md">\hat{\mathbf B}_r = \arg\min_{\operatorname{rank}(\mathbf B)\le r} \|\mathbf Y - \mathbf X\mathbf B\|_F^2 = \hat{\mathbf B}\,\mathbf V_r\mathbf V_r^{\top}, \qquad \mathbf V_r = \text{top } r \text{ right singular vectors of } \mathbf X\hat{\mathbf B}</div>
+<p>“How many wires”: <span class="m">r_{90} = \min\{\, r : R^2(r) \ge 0.9\, R^2(\text{unrestricted}) \,\}</span>.</p>
+<p><b>Degrees versus equal weights.</b> R² in degrees adds up errors over all pose directions, and each PC weighs as much as its variance <span class="m">\lambda_k</span> (chapter 8 of the guide). To weigh them all equally, <i>whiten</i> the pose: convert to PCs and divide each by its standard deviation,</p>
+<div class="md">\mathbf Z = (\mathbf Y - \boldsymbol\mu)\,\mathbf V\,\boldsymbol\Lambda^{-1/2}</div>
+<p>and repeat RRR with <span class="m">\mathbf Z</span>. Result: <span class="m">r_{90} = 3</span> in degrees, but <span class="m">r_{90} = 6</span> of 8 with <span class="m">\mathbf Z</span>. <b>Null input:</b> <span class="m">\tilde{\mathbf X}</span> = the EMG shifted by half a recording relative to the pose; it gives <span class="m">R^2 = 0.014</span> versus 0.17.</p>
+<p class="mb-links">Further reading: <a href="https://scholar.google.com/scholar?q=Semedo+2019+Cortical+areas+interact+through+a+communication+subspace" target="_blank" rel="noopener">Semedo et al. (2019)</a> · <a href="https://scholar.google.com/scholar?q=Izenman+1975+Reduced-rank+regression+for+the+multivariate+linear+model" target="_blank" rel="noopener">Izenman (1975)</a></p></div>
 </section>
 
 <!-- 3 -->
@@ -225,6 +265,20 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
   <div class="honest"><span class="tag" data-l="es">un resultado que no sobrevivió</span><span class="tag" data-l="en">a result that did not survive</span>
     <p data-l="es">La curva gris es el mismo análisis con una <b>entrada nula</b> (la EMG desplazada en el tiempo, sin relación instante a instante con la pose): ya da 0,98 en r = 1 y 0,5-0,8 después. Una regresión medida en grados se inclina hacia las direcciones de mucha varianza sea cual sea la entrada. La EMG real queda solo un poco por encima. Veredicto: <span class="pill open">no informativo tal como se midió</span>. Hace falta medir en unidades blanqueadas y contra una distribución nula (lo hace el análisis de la red, dirección C). La evidencia más limpia sobre qué ve la EMG es el R² por PC: la PC1 muy bien, las demás poco.</p>
     <p data-l="en">The grey curve is the same analysis with a <b>null input</b> (EMG shifted in time, with no moment-to-moment link to the pose): it already gives 0.98 at r = 1 and 0.5-0.8 beyond. A regression measured in degrees leans towards high-variance directions whatever the input. The real EMG is only a little above it. Verdict: <span class="pill open">not informative as measured</span>. It needs whitened units and a null distribution (the network analysis, direction C, does this). The cleanest evidence about what the EMG sees is the per-PC R²: PC1 very well, the others weakly.</p></div>
+<div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p><b>Solapamiento entre subespacios.</b> Con <span class="m">\mathbf U, \mathbf V \in \mathbb R^{20\times r}</span> bases ortonormales de los dos subespacios y <span class="m">\theta_1,\dots,\theta_r</span> sus ángulos principales:</p>
+<div class="md">O(\mathbf U, \mathbf V) = \frac{1}{r}\sum_{i=1}^{r}\cos^2\theta_i = \frac{1}{r}\,\|\mathbf U^{\top}\mathbf V\|_F^2, \qquad \mathbb E\big[O\big]_{\text{al azar}} = \frac{r}{20}</div>
+<p><b>Por qué el control nulo ya da casi 1.</b> Las direcciones de la RRR son las de mayor varianza de las predicciones <span class="m">\hat{\mathbf Y} = \mathbf H\mathbf Y</span>, donde <span class="m">\mathbf H = \mathbf X(\mathbf X^{\top}\mathbf X + \lambda\mathbf I)^{-1}\mathbf X^{\top}</span>. Si <span class="m">\mathbf X</span> no tuviera nada que ver con la pose, <span class="m">\mathbf H</span> se parecería a una proyección sobre un subespacio al azar de dimensión <span class="m">p</span>, y entonces</p>
+<div class="md">\mathbb E\big[\hat{\mathbf Y}^{\top}\hat{\mathbf Y}\big] \approx \frac{p}{T}\,\mathbf Y^{\top}\mathbf Y</div>
+<p>que tiene <b>los mismos autovectores que la pose</b>: las direcciones “decodificables” salen alineadas con las PCs sin que la EMG aporte nada. La comparación correcta es contra este nulo, en unidades blanqueadas (<span class="m">\mathbf Z</span>, cuadro anterior).</p>
+<p class="mb-links">Para profundizar: <a href="https://en.wikipedia.org/wiki/Angles_between_flats" target="_blank" rel="noopener">ángulos principales</a> · <a href="https://en.wikipedia.org/wiki/Projection_matrix" target="_blank" rel="noopener">matriz de proyección (hat matrix)</a></p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p><b>Overlap between subspaces.</b> With <span class="m">\mathbf U, \mathbf V \in \mathbb R^{20\times r}</span> orthonormal bases of the two subspaces and <span class="m">\theta_1,\dots,\theta_r</span> their principal angles:</p>
+<div class="md">O(\mathbf U, \mathbf V) = \frac{1}{r}\sum_{i=1}^{r}\cos^2\theta_i = \frac{1}{r}\,\|\mathbf U^{\top}\mathbf V\|_F^2, \qquad \mathbb E\big[O\big]_{\text{random}} = \frac{r}{20}</div>
+<p><b>Why the null control already gives almost 1.</b> RRR directions are the highest-variance directions of the predictions <span class="m">\hat{\mathbf Y} = \mathbf H\mathbf Y</span>, with <span class="m">\mathbf H = \mathbf X(\mathbf X^{\top}\mathbf X + \lambda\mathbf I)^{-1}\mathbf X^{\top}</span>. If <span class="m">\mathbf X</span> had nothing to do with the pose, <span class="m">\mathbf H</span> would resemble a projection onto a random subspace of dimension <span class="m">p</span>, and then</p>
+<div class="md">\mathbb E\big[\hat{\mathbf Y}^{\top}\hat{\mathbf Y}\big] \approx \frac{p}{T}\,\mathbf Y^{\top}\mathbf Y</div>
+<p>which has <b>the same eigenvectors as the pose</b>: the “decodable” directions come out aligned with the PCs without the EMG contributing anything. The right comparison is against this null, in whitened units (<span class="m">\mathbf Z</span>, previous box).</p>
+<p class="mb-links">Further reading: <a href="https://en.wikipedia.org/wiki/Angles_between_flats" target="_blank" rel="noopener">principal angles</a> · <a href="https://en.wikipedia.org/wiki/Projection_matrix" target="_blank" rel="noopener">projection (hat) matrix</a></p></div>
 </section>
 
 <!-- 4 -->
@@ -253,6 +307,22 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
     <svg class="chart" id="potSvg" viewBox="0 0 760 220" role="img" aria-label="Share of EMG variance and R squared from kinematics per EMG principal component"></svg>
     <div class="legend"><span style="--c:var(--grey)" data-l="es">% de la varianza de la EMG</span><span style="--c:var(--grey)" data-l="en">% of EMG variance</span><span style="--c:var(--s1)" data-l="es">R² desde el movimiento</span><span style="--c:var(--s1)" data-l="en">R² from the movement</span></div>
   </div>
+<div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p><b>NMF.</b> Con <span class="m">\mathbf E \in \mathbb R_{\ge 0}^{16\times T}</span> las envolventes (cada canal escalado a varianza 1):</p>
+<div class="md">\mathbf E \approx \mathbf W\mathbf H, \qquad \mathbf W \in \mathbb R_{\ge 0}^{16\times K}\ \text{(patrones)}, \quad \mathbf H \in \mathbb R_{\ge 0}^{K\times T}\ \text{(activaciones)}, \qquad \mathrm{VAF} = 1 - \frac{\|\mathbf E - \mathbf W\mathbf H\|_F^2}{\|\mathbf E\|_F^2}</div>
+<p>La prueba H4 compara decodificar la pose desde <span class="m">\mathbf H</span> (5 filas) y desde <span class="m">\mathbf E</span> (16 filas), con los mismos retardos.</p>
+<p><b>Por qué los pesos de un decodificador engañan.</b> Los pesos de una regresión lineal son</p>
+<div class="md">\mathbf w = \mathbf C_{x}^{-1}\,\mathbf c_{xy}</div>
+<p>La inversa de la covarianza de la EMG <span class="m">\mathbf C_x^{-1}</span> amplifica las direcciones de <b>poca</b> varianza. Así que “hacia dónde apuntan los pesos” no es “dónde está la señal que lleva la pose”. La comprobación sin ese sesgo va al revés (encoding): predecir cada PC de la EMG, <span class="m">s_k = \mathbf u_k^{\top}\mathbf e</span>, desde la cinemática. La varianza explicada total es <span class="m">\sum_k \frac{\lambda_k}{\sum\lambda}\, R^2_k \approx 0{,}24</span>, repartida por igual entre las PCs.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=Lee+Seung+1999+Learning+the+parts+of+objects+by+non-negative+matrix+factorization" target="_blank" rel="noopener">Lee y Seung (1999), NMF</a> · <a href="https://scholar.google.com/scholar?q=Haufe+2014+On+the+interpretation+of+weight+vectors+of+linear+models+in+multivariate+neuroimaging" target="_blank" rel="noopener">Haufe et al. (2014), cómo (no) interpretar pesos de decodificadores</a></p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p><b>NMF.</b> With <span class="m">\mathbf E \in \mathbb R_{\ge 0}^{16\times T}</span> the envelopes (each channel scaled to unit variance):</p>
+<div class="md">\mathbf E \approx \mathbf W\mathbf H, \qquad \mathbf W \in \mathbb R_{\ge 0}^{16\times K}\ \text{(patterns)}, \quad \mathbf H \in \mathbb R_{\ge 0}^{K\times T}\ \text{(activations)}, \qquad \mathrm{VAF} = 1 - \frac{\|\mathbf E - \mathbf W\mathbf H\|_F^2}{\|\mathbf E\|_F^2}</div>
+<p>Test H4 compares decoding the pose from <span class="m">\mathbf H</span> (5 rows) and from <span class="m">\mathbf E</span> (16 rows), with the same delays.</p>
+<p><b>Why decoder weights mislead.</b> The weights of a linear regression are</p>
+<div class="md">\mathbf w = \mathbf C_{x}^{-1}\,\mathbf c_{xy}</div>
+<p>The inverse EMG covariance <span class="m">\mathbf C_x^{-1}</span> amplifies <b>low</b>-variance directions. So “where the weights point” is not “where the pose-carrying signal is”. The unbiased check goes the other way (encoding): predict each EMG PC, <span class="m">s_k = \mathbf u_k^{\top}\mathbf e</span>, from the kinematics. The total explained variance is <span class="m">\sum_k \frac{\lambda_k}{\sum\lambda}\, R^2_k \approx 0.24</span>, spread evenly across PCs.</p>
+<p class="mb-links">Further reading: <a href="https://scholar.google.com/scholar?q=Lee+Seung+1999+Learning+the+parts+of+objects+by+non-negative+matrix+factorization" target="_blank" rel="noopener">Lee & Seung (1999), NMF</a> · <a href="https://scholar.google.com/scholar?q=Haufe+2014+On+the+interpretation+of+weight+vectors+of+linear+models+in+multivariate+neuroimaging" target="_blank" rel="noopener">Haufe et al. (2014), how (not) to interpret decoder weights</a></p></div>
 </section>
 
 <!-- 5 -->
@@ -274,6 +344,20 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
   </div>
   <p data-l="es"><b>Resultado:</b> se transfieren bien (0,91 frente a 0,95) y son casi idénticas en las dos manos (0,98 frente a 0,60 al azar). <span class="pill open">compatible, no concluyente</span>: la anatomía (qué músculo hay bajo cada electrodo) predice exactamente lo mismo.</p>
   <p data-l="en"><b>Result:</b> they transfer well (0.91 versus 0.95) and are nearly identical on both hands (0.98 versus 0.60 by chance). <span class="pill open">consistent, not conclusive</span>: anatomy (which muscle lies under each electrode) predicts exactly the same.</p>
+<div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p><b>Sinergias en una tarea nueva.</b> Los patrones <span class="m">\mathbf W</span> se aprenden sin esa tarea y se dejan fijos; solo se ajustan las activaciones, con mínimos cuadrados no negativos:</p>
+<div class="md">\mathbf H_{\text{nueva}} = \arg\min_{\mathbf H \ge 0} \|\mathbf E_{\text{nueva}} - \mathbf W\mathbf H\|_F^2, \qquad \text{y se mide el VAF con ese } \mathbf H</div>
+<p><b>Parecido entre manos.</b> Coseno entre patrones, emparejados con el algoritmo húngaro (el emparejamiento que maximiza la suma de cosenos):</p>
+<div class="md">\cos(\mathbf w_L, \mathbf w_R) = \frac{\mathbf w_L^{\top}\mathbf w_R}{\|\mathbf w_L\|\,\|\mathbf w_R\|}</div>
+<p>Ojo: dos vectores no negativos al azar nunca son perpendiculares, así que el coseno “por azar” no es 0. El nulo baraja los canales de una mano, <span class="m">\cos(\mathbf w_L, \mathbf P_\pi\mathbf w_R)</span> con <span class="m">\pi</span> una permutación al azar, y da 0,60.</p>
+<p class="mb-links">Para profundizar: <a href="https://en.wikipedia.org/wiki/Non-negative_least_squares" target="_blank" rel="noopener">mínimos cuadrados no negativos</a> · <a href="https://en.wikipedia.org/wiki/Hungarian_algorithm" target="_blank" rel="noopener">algoritmo húngaro</a></p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p><b>Synergies on a new task.</b> The patterns <span class="m">\mathbf W</span> are learned without that task and kept fixed; only the activations are fitted, by non-negative least squares:</p>
+<div class="md">\mathbf H_{\text{new}} = \arg\min_{\mathbf H \ge 0} \|\mathbf E_{\text{new}} - \mathbf W\mathbf H\|_F^2, \qquad \text{and VAF is measured with that } \mathbf H</div>
+<p><b>Similarity between hands.</b> Cosine between patterns, matched with the Hungarian algorithm (the pairing that maximizes the sum of cosines):</p>
+<div class="md">\cos(\mathbf w_L, \mathbf w_R) = \frac{\mathbf w_L^{\top}\mathbf w_R}{\|\mathbf w_L\|\,\|\mathbf w_R\|}</div>
+<p>Careful: two random non-negative vectors are never perpendicular, so the cosine “by chance” is not 0. The null shuffles one hand’s channels, <span class="m">\cos(\mathbf w_L, \mathbf P_\pi\mathbf w_R)</span> with <span class="m">\pi</span> a random permutation, and gives 0.60.</p>
+<p class="mb-links">Further reading: <a href="https://en.wikipedia.org/wiki/Non-negative_least_squares" target="_blank" rel="noopener">non-negative least squares</a> · <a href="https://en.wikipedia.org/wiki/Hungarian_algorithm" target="_blank" rel="noopener">Hungarian algorithm</a></p></div>
 </section>
 
 <!-- 6 -->
@@ -320,7 +404,17 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
     <p data-l="en">Pose beats EMG in all 12 people. A pose PCA basis learned from the other 11 costs only <b>0.2-0.45°</b> extra error on a new person (k = 4: 9.0° versus 8.6° with their own basis). And most striking: <b>the pose subspace follows the task; the EMG subspace follows the person</b>.</p>
     <figure><img src="figs/cross_user_who_vs_what.png" alt="Bar chart: pose subspace overlap drops when the task changes, EMG subspace overlap drops when the person changes" loading="lazy" width="1700" height="610"><figcaption data-l="es">Solapamiento de subespacios (3 PCs). La pose cae al cambiar de tarea; la EMG cae al cambiar de persona.</figcaption><figcaption data-l="en">Subspace overlap (3 PCs). Pose drops when the task changes; EMG drops when the person changes.</figcaption></figure>
     <figure><img src="figs/cross_user_louo.png" alt="Leave-one-user-out reconstruction: a pose basis from other users costs little; EMG transfers worse" loading="lazy" width="2540" height="640"><figcaption data-l="es">Reconstruir a una persona nueva con la base de las otras 11.</figcaption><figcaption data-l="en">Reconstructing a new person with the other 11 people’s basis.</figcaption></figure>
-    <p class="note" data-l="es"><b>Cuidado:</b> parte de lo compartido en la pose lo impone que todos hicieron los mismos gestos instruidos. No podemos separar anatomía de colocación de la pulsera. El rango 3 decodificable por persona está medido en grados (mismo sesgo que H2/H3).</p>
+    <div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p>Para cada persona <span class="m">u</span>, <span class="m">\mathbf V_u</span> son sus 3 primeras PCs (de pose o de EMG). Con el solapamiento <span class="m">O</span> del capítulo 3, el <b>índice de compartido</b> mide qué parte de lo que se repite dentro de una persona se repite también entre personas, por encima de un nulo:</p>
+<div class="md">S = \frac{O_{\text{entre personas}} - O_{\text{nulo}}}{O_{\text{misma persona, otra sesión}} - O_{\text{nulo}}}</div>
+<p>0 = como el nulo, 1 = como la misma persona. El <b>nulo estructurado</b> mantiene la estructura genérica y destruye la correspondencia: en la pose se intercambian dedos (mismos tipos de articulación, otro dedo); en la EMG se gira la pulsera (permutación circular de los 16 canales). Con los números: pose <span class="m">(0{,}80 - 0{,}65)/(0{,}93 - 0{,}65) \approx 0{,}5</span>; EMG <span class="m">(0{,}66 - 0{,}63)/(0{,}94 - 0{,}63) \approx 0{,}1</span>. (El valor publicado, 0,47 y 0,07, se calcula persona a persona y se promedia.)</p>
+<p><b>Base de otras personas.</b> Para la persona <span class="m">u</span> se usa la PCA de las otras 11, <span class="m">\mathbf P_{-u} = \mathbf V_{-u}\mathbf V_{-u}^{\top}</span>, y se mide el error de <span class="m">\boldsymbol\mu + \mathbf P_{-u}(\mathbf y - \boldsymbol\mu)</span>.</p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p>For each person <span class="m">u</span>, <span class="m">\mathbf V_u</span> are their top 3 PCs (pose or EMG). With the overlap <span class="m">O</span> from chapter 3, the <b>sharedness index</b> measures what fraction of what repeats within a person also repeats across people, above a null:</p>
+<div class="md">S = \frac{O_{\text{across people}} - O_{\text{null}}}{O_{\text{same person, other session}} - O_{\text{null}}}</div>
+<p>0 = like the null, 1 = like the same person. The <b>structured null</b> keeps the generic structure and destroys the correspondence: for the pose, fingers are swapped (same joint types, other finger); for the EMG, the band is rotated (circular permutation of the 16 channels). With the numbers: pose <span class="m">(0.80 - 0.65)/(0.93 - 0.65) \approx 0.5</span>; EMG <span class="m">(0.66 - 0.63)/(0.94 - 0.63) \approx 0.1</span>. (The reported values, 0.47 and 0.07, are computed per person and averaged.)</p>
+<p><b>Basis from other people.</b> For person <span class="m">u</span> we use the PCA of the other 11, <span class="m">\mathbf P_{-u} = \mathbf V_{-u}\mathbf V_{-u}^{\top}</span>, and measure the error of <span class="m">\boldsymbol\mu + \mathbf P_{-u}(\mathbf y - \boldsymbol\mu)</span>.</p></div>
+<p class="note" data-l="es"><b>Cuidado:</b> parte de lo compartido en la pose lo impone que todos hicieron los mismos gestos instruidos. No podemos separar anatomía de colocación de la pulsera. El rango 3 decodificable por persona está medido en grados (mismo sesgo que H2/H3).</p>
     <p class="note" data-l="en"><b>Careful:</b> part of the pose sharing is imposed by everyone doing the same instructed gestures. We cannot separate anatomy from band placement. The per-person decodable rank of 3 is measured in degrees (same bias as H2/H3).</p>
   </div>
   <h3 data-l="es">B. Coherencia intermuscular</h3><h3 data-l="en">B. Intermuscular coherence</h3>
@@ -332,7 +426,21 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
     <p data-l="es"><b>Pero no hay pico a 8-30 Hz:</b> el exceso es plano de 1 a 45 Hz y desaparece hacia 100 Hz, y sale igual en movimientos lentos y rápidos. No parece el ritmo alfa/beta de un mando cortical. Quedan dos lecturas que estos datos no separan: un mando común de banda ancha a las motoneuronas de cada sector (neural, pero probablemente dentro de un mismo músculo), o crosstalk de motor units compartidas que la señal cruda subestima.</p>
     <p data-l="en"><b>But there is no 8-30 Hz bump:</b> the excess is flat from 1 to 45 Hz, fades by 100 Hz, and is the same in slow and fast movements. It does not look like the alpha/beta rhythm of cortical drive. Two readings remain that this data cannot separate: broadband common input to the motor neurons of each sector (neural, but probably within one muscle), or crosstalk from shared motor units that the raw signal underestimates.</p>
     <figure><img src="figs/coherence_within_between_spectra.png" alt="Coherence spectra of rectified EMG for within-synergy and between-synergy electrode pairs at ring distances 1 to 3, and the within-minus-between difference by frequency" loading="lazy" width="2721" height="626"><figcaption data-l="es">Azul: pares dentro de una sinergia; naranja: entre sinergias, a igual distancia. Derecha: la diferencia por frecuencia (sombreado gris = 8-30 Hz).</figcaption><figcaption data-l="en">Blue: pairs within a synergy; orange: between synergies, at equal distance. Right: the difference by frequency (grey band = 8-30 Hz).</figcaption></figure>
-    <p class="note" data-l="es"><b>Cuidado:</b> una persona, sin posturas realmente quietas (la mano casi nunca para en estas tareas), pocos pares por distancia. <b>La siguiente prueba más directa:</b> coherencia entre las dos manos, grabadas a la vez, que no pueden compartir crosstalk.</p>
+    <div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p>Coherencia de la EMG rectificada <span class="m">|x_c|</span> entre los electrodos <span class="m">c</span> y <span class="m">d</span>, con espectros de Welch promediados sobre <span class="m">L</span> ventanas de 1 s:</p>
+<div class="md">C_{cd}(f) = \frac{|S_{cd}(f)|^2}{S_{cc}(f)\,S_{dd}(f)}, \qquad C_{\text{crit}} = 1 - \alpha^{1/(L-1)} \ \ (\alpha = 0{,}05)</div>
+<p><b>Exceso dentro de la sinergia</b>, comparando pares a la misma distancia <span class="m">d</span> en el anillo y promediando en 8-30 Hz:</p>
+<div class="md">\Delta = \frac{1}{|\mathcal D|}\sum_{d\in\mathcal D}\Big(\overline{C}_{\text{dentro}}(d) - \overline{C}_{\text{entre}}(d)\Big) = 0{,}081</div>
+<p>El valor p sale de repetirlo con las 660 formas de partir el anillo en 4 sectores contiguos: ninguna da un <span class="m">\Delta</span> mayor (p = 0,002). La “firma neural” esperada sería un pico: <span class="m">\Delta_{8\text{-}30} - \Delta_{\text{flancos}} > 0</span>. Sale <span class="m">-0{,}002</span>.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=Farina+Negro+2015+Common+synaptic+input+to+motor+neurons+motor+unit+synchronization+and+force+control" target="_blank" rel="noopener">Farina y Negro (2015)</a> · <a href="https://scholar.google.com/scholar?q=Boonstra+2015+Muscle+networks+connectivity+analysis+of+EMG+activity+during+postural+control" target="_blank" rel="noopener">Boonstra et al. (2015), redes de coherencia muscular</a></p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p>Coherence of the rectified EMG <span class="m">|x_c|</span> between electrodes <span class="m">c</span> and <span class="m">d</span>, with Welch spectra averaged over <span class="m">L</span> one-second windows:</p>
+<div class="md">C_{cd}(f) = \frac{|S_{cd}(f)|^2}{S_{cc}(f)\,S_{dd}(f)}, \qquad C_{\text{crit}} = 1 - \alpha^{1/(L-1)} \ \ (\alpha = 0.05)</div>
+<p><b>Within-synergy excess</b>, comparing pairs at the same ring distance <span class="m">d</span> and averaging over 8-30 Hz:</p>
+<div class="md">\Delta = \frac{1}{|\mathcal D|}\sum_{d\in\mathcal D}\Big(\overline{C}_{\text{within}}(d) - \overline{C}_{\text{between}}(d)\Big) = 0.081</div>
+<p>The p-value comes from repeating it with all 660 ways of splitting the ring into 4 contiguous sectors: none gives a larger <span class="m">\Delta</span> (p = 0.002). The expected “neural signature” would be a bump: <span class="m">\Delta_{8\text{-}30} - \Delta_{\text{flanks}} > 0</span>. It comes out <span class="m">-0.002</span>.</p>
+<p class="mb-links">Further reading: <a href="https://scholar.google.com/scholar?q=Farina+Negro+2015+Common+synaptic+input+to+motor+neurons+motor+unit+synchronization+and+force+control" target="_blank" rel="noopener">Farina & Negro (2015)</a> · <a href="https://scholar.google.com/scholar?q=Boonstra+2015+Muscle+networks+connectivity+analysis+of+EMG+activity+during+postural+control" target="_blank" rel="noopener">Boonstra et al. (2015), muscle coherence networks</a></p></div>
+<p class="note" data-l="es"><b>Cuidado:</b> una persona, sin posturas realmente quietas (la mano casi nunca para en estas tareas), pocos pares por distancia. <b>La siguiente prueba más directa:</b> coherencia entre las dos manos, grabadas a la vez, que no pueden compartir crosstalk.</p>
     <p class="note" data-l="en"><b>Careful:</b> one person, no truly still postures (the hand almost never stops in these tasks), few pairs per distance. <b>The most direct next test:</b> coherence between the two hands, recorded at the same time, which cannot share crosstalk.</p>
   </div>
   <h3 data-l="es">C. Dentro de la red de Meta</h3><h3 data-l="en">C. Inside Meta’s network</h3>
@@ -347,7 +455,15 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
     <p data-l="en"><b>Most useful for the project:</b> a linear readout of the regression network, fitted to this person, recovers PCs 3-10 (R² 0.1-0.35) that the end-to-end model misses on this new person (≈ 0). The information is in the encoder; what fails across people is the decoder. That supports a shared latent plus a light per-person mapping.</p>
     <figure><img src="figs/network_dimensionality.png" alt="Cumulative variance of network features versus EMG envelopes and pose" loading="lazy" width="2090" height="660"><figcaption data-l="es">Dimensiones de la representación interna, comparadas con la EMG y la pose.</figcaption><figcaption data-l="en">Dimensions of the internal representation, compared with the EMG and the pose.</figcaption></figure>
     <figure><img src="figs/network_readout.png" alt="Readout of pose from network features, per pose PC, compared with the end-to-end model" loading="lazy" width="2540" height="640"><figcaption data-l="es">Centro: R² por PC. Las líneas continuas (lectura lineal ajustada a la persona) superan a la discontinua naranja (modelo de regresión de Meta) en PC3-PC10.</figcaption><figcaption data-l="en">Middle: R² per PC. The solid lines (linear readout fitted to the person) beat the dashed orange (Meta’s regression model) on PC3-PC10.</figcaption></figure>
-    <p class="note" data-l="es"><b>Cuidado:</b> una persona, ~10 min; las lecturas lineales se calibran con esta persona (el modelo de Meta no); validación por bloques dentro de cada grabación.</p>
+    <div class="mathbox" data-l="es"><p class="mb-title">En fórmulas</p>
+<p>Con <span class="m">\mathbf F \in \mathbb R^{T\times 64}</span> las features internas del codificador (25 Hz), sus autovalores <span class="m">\lambda_i</span> dan el PR (18-21). La lectura lineal usa solo las <span class="m">k</span> primeras PCs de las features, <span class="m">\mathbf F\mathbf U_k</span>:</p>
+<div class="md">R^2(k) = R^2\Big(\mathbf Y,\ \mathbf F\,\mathbf U_k\,\hat{\boldsymbol\beta}_k\Big), \qquad k_{90} = \min\{\,k : R^2(k) \ge 0{,}9\,R^2(64)\,\}</div>
+<p>Que <span class="m">k_{90}</span> sea 20-32 aunque la lectura de rango 3 baste dice lo mismo que H4: las direcciones de <b>mucha varianza</b> de la red no son las que llevan la pose. El control de pesos aleatorios (misma arquitectura sin entrenar) da PR = 48: el entrenamiento comprime, pero poco.</p></div>
+<div class="mathbox" data-l="en"><p class="mb-title">In formulas</p>
+<p>With <span class="m">\mathbf F \in \mathbb R^{T\times 64}</span> the encoder’s internal features (25 Hz), their eigenvalues <span class="m">\lambda_i</span> give the PR (18-21). The linear readout uses only the top <span class="m">k</span> feature PCs, <span class="m">\mathbf F\mathbf U_k</span>:</p>
+<div class="md">R^2(k) = R^2\Big(\mathbf Y,\ \mathbf F\,\mathbf U_k\,\hat{\boldsymbol\beta}_k\Big), \qquad k_{90} = \min\{\,k : R^2(k) \ge 0.9\,R^2(64)\,\}</div>
+<p>That <span class="m">k_{90}</span> is 20-32 even though a rank-3 readout suffices says the same as H4: the network’s <b>high-variance</b> directions are not the ones carrying the pose. The random-weight control (same architecture, untrained) gives PR = 48: training compresses, but only somewhat.</p></div>
+<p class="note" data-l="es"><b>Cuidado:</b> una persona, ~10 min; las lecturas lineales se calibran con esta persona (el modelo de Meta no); validación por bloques dentro de cada grabación.</p>
     <p class="note" data-l="en"><b>Careful:</b> one person, ~10 min; the linear readouts are calibrated on this person (Meta’s model is not); blocked CV within each recording.</p>
   </div>
   <h3 data-l="es">D. Más adelante</h3><h3 data-l="en">D. Later</h3>
@@ -404,6 +520,7 @@ figcaption { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
 </div>
 <div class="tip" id="tip" hidden></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script>
 "use strict";
 let LANG = "es";
@@ -605,4 +722,45 @@ fetch("data.json").then(r => r.json()).then(D => {
   drawH5(); redrawers.push(drawH5);
 }).catch(() => { $$(".readout").forEach(r => { r.textContent = T({ es: "No se pudieron cargar los datos. Recarga la página.", en: "The data could not be loaded. Reload the page." }); }); });
 
+
+// math: KaTeX -> native MathML (no extra fonts or stylesheets needed)
+// Chrome's MathML ignores mathvariant, so map bold / bold-italic / double-struck letters to Unicode math letters.
+function fixVariants(root) {
+  const conv = (ch, v) => {
+    const c = ch.codePointAt(0);
+    if (v === "double-struck") return ch === "R" ? "ℝ" : ch;
+    const up = c >= 65 && c <= 90, lo = c >= 97 && c <= 122, GU = c >= 0x391 && c <= 0x3A9, gl = c >= 0x3B1 && c <= 0x3C9;
+    if (v === "bold") { if (up) return String.fromCodePoint(0x1D400 + c - 65); if (lo) return String.fromCodePoint(0x1D41A + c - 97); if (GU) return String.fromCodePoint(0x1D6A8 + c - 0x391); if (gl) return String.fromCodePoint(0x1D6C2 + c - 0x3B1); }
+    if (v === "bold-italic") { if (up) return String.fromCodePoint(0x1D468 + c - 65); if (lo) return String.fromCodePoint(0x1D482 + c - 97); if (GU) return String.fromCodePoint(0x1D71C + c - 0x391); if (gl) return String.fromCodePoint(0x1D736 + c - 0x3B1); }
+    return ch;
+  };
+  root.querySelectorAll("[mathvariant]").forEach(n => {
+    const v = n.getAttribute("mathvariant");
+    if (!["bold", "bold-italic", "double-struck"].includes(v) || n.children.length) return;
+    n.textContent = Array.from(n.textContent).map(ch => conv(ch, v)).join("");
+    n.setAttribute("mathvariant", "normal");
+  });
+}
+function texRender(el) {
+  const tex = el.dataset.tex || el.textContent;
+  el.dataset.tex = tex;
+  const disp = el.classList.contains("md");
+  const go = t => { katex.render(t, el, { output: "mathml", displayMode: disp, throwOnError: false }); fixVariants(el); };
+  try {
+    go(tex);
+    // a multi-part display formula that does not fit: stack its parts on separate lines
+    if (disp && el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2 && tex.includes("\\qquad"))
+      go("\\begin{gathered}" + tex.replace(/,?\s*\\qquad\s*/g, " \\\\ ") + "\\end{gathered}");
+  } catch (e) {}
+}
+function renderMath() {
+  if (!window.katex) return;
+  $$(".m, .md").forEach(el => { if (!el.querySelector("math")) texRender(el); });
+}
+function refitMath() {
+  if (!window.katex) return;
+  $$(".md").forEach(el => { if (el.dataset.tex && el.offsetParent) texRender(el); });
+}
+renderMath(); redrawers.push(refitMath);
+let _rz; window.addEventListener("resize", () => { clearTimeout(_rz); _rz = setTimeout(refitMath, 150); });
 </script>

@@ -133,6 +133,18 @@ ul.reads li { margin-bottom: 8px; }
 :root[lang="fr"] .quiz .q::before { content: "Compris ? "; }
 .seg.lang { margin: 4px 0 10px; }
 .seg.lang button { font-family: var(--mono); font-size: 12px; padding: 4px 10px; }
+
+.mathbox { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 18px; margin: 22px 0; }
+.mathbox .mb-title { font-family: var(--display); font-weight: 700; font-size: 17px; margin: 0 0 8px; }
+.mathbox .mb-title::before { content: "\2211  "; color: var(--accent); }
+.mathbox p, .mathbox li { font-size: 16px; }
+.mathbox ul, .mathbox ol { padding-left: 22px; margin: 6px 0 12px; }
+.mathbox li { margin-bottom: 6px; }
+.md { overflow-x: auto; overflow-y: hidden; margin: 10px 0 14px; padding: 4px 0; max-width: 100%; }
+.md math { font-size: 1.12em; }
+.m math { font-size: 1.04em; }
+math { color: var(--ink); }
+.mathbox .mb-links { font-size: 14px; color: var(--ink-3); margin-bottom: 0; }
 </style>
 
 <div class="wrap">
@@ -193,6 +205,19 @@ ul.reads li { margin-bottom: 8px; }
     </div>
     <canvas id="muCanvas" height="300" aria-label="Animación: trenes de disparo de motor units y la señal suma en el electrodo" data-i18n-attr="aria-label|motor.10@aria-label"></canvas>
   </div>
+  <div class="mathbox" data-i18n="math.motor"><p class="mb-title">En fórmulas</p>
+<p>Lo que mide el electrodo <span class="m">c</span> es una suma de onditas, cada una colocada en el instante de un disparo:</p>
+<div class="md">x_c(t) = \sum_{i=1}^{N} \sum_{k} a_{i,c}\, h_i\!\left(t - t_{i,k}\right) + \varepsilon_c(t)</div>
+<ul>
+<li><span class="m">t_{i,k}</span>: el instante del disparo número <span class="m">k</span> de la motor unit <span class="m">i</span>. <b>Es el mensaje.</b></li>
+<li><span class="m">h_i(t)</span>: la forma del MUAP de esa unidad (su firma); dura unos 5-15 ms.</li>
+<li><span class="m">a_{i,c}</span>: cuánto la oye el electrodo <span class="m">c</span>. Cae rápido con la distancia <span class="m">d</span>, más o menos como <span class="m">a \approx e^{-d/\lambda}</span> con <span class="m">\lambda \approx 4</span> mm.</li>
+<li><span class="m">\varepsilon_c(t)</span>: el ruido del sensor.</li>
+</ul>
+<p><b>Por qué parece ruido.</b> Si las unidades disparan sin sincronizarse, la suma se comporta como ruido y su potencia es la suma de las potencias (teorema de Campbell). Con <span class="m">N</span> unidades parecidas que disparan <span class="m">f</span> veces por segundo:</p>
+<div class="md">\mathrm{RMS}(x) \approx \sqrt{N\, f \int h(t)^2\, dt}</div>
+<p>Ejemplo: pasar de 4 a 40 unidades multiplica la amplitud por <span class="m">\sqrt{10} \approx 3{,}2</span>, no por 10. La amplitud de la EMG crece con la raíz del número de unidades activas y de su ritmo.</p>
+<p class="mb-links">Para profundizar: <a href="https://en.wikipedia.org/wiki/Campbell%27s_theorem_(probability)" target="_blank" rel="noopener">teorema de Campbell</a> · <a href="https://scholar.google.com/scholar?q=Farina+Merletti+Enoka+2004+The+extraction+of+neural+strategies+from+the+surface+EMG" target="_blank" rel="noopener">Farina, Merletti y Enoka (2004)</a></p></div>
   <div class="quiz" data-answer="1">
     <p class="q" data-i18n="motor.11">¿Qué información manda el sistema nervioso a través de una motor unit?</p>
     <div class="opts">
@@ -227,6 +252,17 @@ ul.reads li { margin-bottom: 8px; }
   <p data-i18n="bandas.12"><b>No.</b> A la red le entra el <b>voltaje crudo</b> de los 16 canales (solo con un filtro que quita lo que está por debajo de 40 Hz y un escalado). La primera capa es una <b>convolución</b>: 256 filtros pequeñitos, cada uno mira 16 canales × 5,5 ms, y sus pesos se aprenden solos durante el entrenamiento.</p>
   <p data-i18n="bandas.13">Lo que hicimos nosotros fue <b>abrir el modelo ya entrenado</b> y calcular la FFT de esos 256 filtros para ver qué frecuencias dejan pasar. Resultado: son <b>filtros pasa-banda entre ~80 y 400 Hz</b>, y cada uno combina unos <b>4 electrodos vecinos con signos opuestos</b> (resta un vecino a otro, como un electrodo diferencial). Es decir, la red aprendió sola a hacer “zoom” en las unidades cercanas.</p>
   <figure><img src="figs/filters.png" alt="Respuesta en frecuencia de los 256 filtros de la primera capa de vemg2pose, ordenados: todos son pasa-banda entre unos 80 y 400 Hz" loading="lazy" width="1203" height="907" data-i18n-attr="alt|bandas.14@alt"><figcaption data-i18n="bandas.15">Cada fila es un filtro de la primera capa (ordenados). Oscuro = deja pasar. Nada por encima de ~500 Hz.</figcaption></figure>
+  <div class="mathbox" data-i18n="math.bandas"><p class="mb-title">En fórmulas</p>
+<p><b>Espectro.</b> La transformada de Fourier reescribe la señal como suma de senos. El espectro de potencia es su módulo al cuadrado, y la potencia de una banda es el área bajo el espectro entre sus dos frecuencias:</p>
+<div class="md">X(f) = \int x(t)\, e^{-i 2\pi f t}\, dt, \qquad P(f) = |X(f)|^2, \qquad P_{[f_1,f_2]} = \int_{f_1}^{f_2} P(f)\, df</div>
+<p><b>Firma × mensaje.</b> Cada unidad es su forma colocada en cada disparo: una <i>convolución</i> <span class="m">x_i = h_i * s_i</span>, con el tren de disparos <span class="m">s_i(t) = \sum_k \delta(t - t_{i,k})</span>. El teorema de convolución la convierte en un producto:</p>
+<div class="md">|X_i(f)|^2 = \underbrace{|H_i(f)|^2}_{\text{firma}} \cdot \underbrace{|S_i(f)|^2}_{\text{mensaje}}</div>
+<p>Por encima de ~50 Hz el espectro de un tren de disparos es casi plano, así que lo que da forma al espectro de la EMG es <span class="m">H_i</span>, la firma, y no el mensaje.</p>
+<p><b>Anchura ↔ frecuencia, con números.</b> Si el MUAP es la derivada de una gaussiana de anchura <span class="m">\sigma</span>:</p>
+<div class="md">h(t) = -\frac{t}{\sigma}\, e^{-t^2/2\sigma^2} \;\Rightarrow\; |H(f)|^2 \propto f^2\, e^{-(2\pi\sigma f)^2}, \qquad f_{\text{pico}} = \frac{1}{2\pi\sigma}</div>
+<p>Con <span class="m">\sigma = 1</span> ms el pico está en ~160 Hz; con <span class="m">\sigma = 3</span> ms (unidad profunda, onda ensanchada por el tejido), en ~53 Hz. Es lo que ves en el laboratorio.</p>
+<p><b>La primera capa de Meta.</b> Cada filtro <span class="m">j</span> mezcla canales e instantes: <span class="m">y_j(t) = \sum_{c=1}^{16}\sum_{\tau=0}^{10} w_{j,c,\tau}\, x_c(t-\tau)</span>. Con 11 muestras a 2 kHz, su resolución en frecuencia es de unos <span class="m">2000/11 \approx 180</span> Hz: solo distingue “bajo”, “medio” y “alto”.</p>
+<p class="mb-links">Para profundizar: <a href="https://www.youtube.com/watch?v=spUNpyF58BY" target="_blank" rel="noopener">3Blue1Brown sobre Fourier</a> · <a href="https://en.wikipedia.org/wiki/Convolution_theorem" target="_blank" rel="noopener">teorema de convolución</a> · <a href="https://en.wikipedia.org/wiki/Parseval%27s_theorem" target="_blank" rel="noopener">teorema de Parseval</a></p></div>
   <div class="quiz" data-answer="0">
     <p class="q" data-i18n="bandas.16">Si una motor unit está más profunda, su energía se va sobre todo a…</p>
     <div class="opts">
@@ -268,6 +304,13 @@ ul.reads li { margin-bottom: 8px; }
     <tr><td data-i18n="anillo.26">16 electrodos × 5 instantes (ahora, −0,1 s… −0,4 s)</td><td data-i18n="anillo.27">dónde + historia reciente</td><td class="n" data-i18n="anillo.28">0,50</td><td class="n" data-i18n="anillo.29">0,38</td></tr>
   </tbody></table></div>
   <p data-i18n="anillo.30">Las bandas añaden información respecto a usar solo “dónde” (16 números: 0,31 y 0,24), pero <b>no más que gastar esos mismos números en historia temporal</b>. Las bandas son útiles, no especiales. (Azar: 0,07 y 0,09.)</p>
+  <div class="mathbox" data-i18n="math.anillo"><p class="mb-title">En fórmulas</p>
+<p>Cada canal es <b>bipolar</b>: la diferencia entre dos electrodos vecinos, <span class="m">x_c = \phi(\mathbf r_c^{+}) - \phi(\mathbf r_c^{-})</span>, donde <span class="m">\phi</span> es el potencial eléctrico en la piel. Lo que llega igual a los dos (ruido lejano) se cancela; lo cercano no.</p>
+<p><b>El mapa de cada movimiento.</b> Para el electrodo <span class="m">c</span>, con <span class="m">E_c(t)</span> el logaritmo de su envolvente en la banda 120-250 Hz:</p>
+<div class="md">\Delta_c = \overline{E_c}^{\,\text{movimiento}} - \overline{E_c}^{\,\text{reposo}}, \qquad \tilde{\Delta}_c = \Delta_c - \frac{1}{16}\sum_{c'=1}^{16} \Delta_{c'}</div>
+<p><span class="m">\Delta_c</span> es lo que ves con la casilla desmarcada (casi todo positivo: esfuerzo); <span class="m">\tilde{\Delta}_c</span>, con la casilla marcada. Restar la media de los 16 deja solo <i>dónde</i> sube más que el resto. Como son logaritmos, una diferencia de 0,7 significa más o menos <span class="m">e^{0{,}7} \approx 2</span> veces más actividad.</p>
+<p><b>Acierto del clasificador.</b> Usamos la <i>exactitud equilibrada</i>, la media de los aciertos de cada clase, para que las clases frecuentes no hagan trampa: <span class="m">\mathrm{BA} = \frac{1}{K}\sum_{k=1}^{K} \frac{\text{aciertos}_k}{n_k}</span>. Al azar vale <span class="m">1/K</span>: 0,07 con 14 tareas y 0,09 con 11 clases de dedo.</p>
+<p class="mb-links">Para profundizar: <a href="https://en.wikipedia.org/wiki/Electromyography" target="_blank" rel="noopener">EMG en Wikipedia</a> · <a href="https://scholar.google.com/scholar?q=Merletti+Muceli+2019+Tutorial+Surface+EMG+detection+in+space+and+time+best+practices" target="_blank" rel="noopener">Merletti y Muceli (2019), tutorial de EMG de superficie</a></p></div>
   <div class="quiz" data-answer="1">
     <p class="q" data-i18n="anillo.31">Al extender el índice, ¿dónde esperas más actividad?</p>
     <div class="opts">
@@ -313,6 +356,18 @@ ul.reads li { margin-bottom: 8px; }
     <div class="readout" id="trkRead"></div>
   </div>
   <p data-i18n="derivadas.34">Integrar velocidades funciona bien si conoces el inicio, aunque el error se va acumulando (por eso el benchmark reinicia cada ventana de 5 s). Sin inicio, todo queda desplazado. En los datos reales: tracking <b>9,2°</b> de error medio, regresión <b>13,0°</b>. Detalle técnico: el modelo de “regresión” de Meta también integra velocidades a partir de 250 ms; lo que le falta es la postura inicial.</p>
+  <div class="mathbox" data-i18n="math.derivadas"><p class="mb-title">En fórmulas</p>
+<p><b>Derivada e integral con muestras.</b> Con un ángulo medido cada <span class="m">\Delta t</span> (aquí 10 ms):</p>
+<div class="md">\dot\theta(t_n) \approx \frac{\theta_{n+1} - \theta_{n-1}}{2\,\Delta t}, \qquad \theta(t_n) = \theta_0 + \sum_{m=1}^{n} \dot\theta(t_m)\, \Delta t</div>
+<p>La primera es la pendiente; la segunda suma cambios pequeños desde el inicio (el área). La integral necesita <span class="m">\theta_0</span>: sin él, todo queda desplazado (laboratorio de tracking).</p>
+<p><b>La física de una articulación.</b> El par de los músculos <span class="m">\tau</span> mueve el dedo según</p>
+<div class="md">\tau(t) = I\,\ddot\theta + B\,\dot\theta + K\,(\theta - \theta_0)</div>
+<p><span class="m">I</span> = inercia (pequeña en un dedo), <span class="m">B</span> = amortiguamiento (el tejido es viscoso), <span class="m">K</span> = rigidez. Como los músculos solo tiran, partimos la velocidad en dos partes positivas: <span class="m">v^{+} = \max(\dot\theta, 0)</span> (flexionando) y <span class="m">v^{-} = \max(-\dot\theta, 0)</span> (extendiendo), con <span class="m">\dot\theta = v^{+} - v^{-}</span>.</p>
+<p><b>El modelo de encoding</b> que da R² = 0,22, para el electrodo <span class="m">c</span> y con la cinemática 60 ms después:</p>
+<div class="md">E_c(t) \approx \beta_0 + \boldsymbol\beta_{\text{pos}}^{\top}\mathbf z(t+\delta) + \boldsymbol\beta_{+}^{\top}\mathbf v^{+}(t+\delta) + \boldsymbol\beta_{-}^{\top}\mathbf v^{-}(t+\delta) + \boldsymbol\beta_{\text{acc}}^{\top}\mathbf a^{\pm}(t+\delta), \qquad \delta = 60\ \text{ms}</div>
+<p>Aquí <span class="m">\mathbf z</span> son las 8 primeras PCs de la pose y los <span class="m">\boldsymbol\beta</span> se ajustan con regresión ridge.</p>
+<p><b>Por qué integrar acumula error.</b> Si la velocidad estimada tiene un sesgo <span class="m">b</span>, el error de posición crece como <span class="m">b\,t</span>. Si tiene ruido independiente de desviación <span class="m">\sigma</span> en cada paso, crece como <span class="m">\sigma\,\Delta t\,\sqrt{n}</span> (un paseo aleatorio). Por eso el benchmark reinicia cada ventana de 5 s.</p>
+<p class="mb-links">Para profundizar: <a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">3Blue1Brown: cálculo</a> · <a href="https://en.wikipedia.org/wiki/Finite_difference" target="_blank" rel="noopener">diferencias finitas</a> · <a href="https://en.wikipedia.org/wiki/Random_walk" target="_blank" rel="noopener">paseo aleatorio</a></p></div>
   <div class="quiz" data-answer="2">
     <p class="q" data-i18n="derivadas.35">Conoces la velocidad del dedo en cada instante y su posición inicial. ¿Cómo obtienes la posición?</p>
     <div class="opts">
@@ -351,6 +406,16 @@ ul.reads li { margin-bottom: 8px; }
   <p data-i18n="tiempo.19">El “filtro temporal” son los <b>pesos de nuestra regresión con retardos</b> (punto 2), no algo de Meta. Para un electrodo, el modelo da un peso a cada instante pasado.</p>
   <figure><img src="figs/trf.png" alt="Pesos del decodificador lineal para el canal 13 a lo largo de los últimos 300 ms: para velocidad cambian de signo, para posición tienen siempre el mismo signo" loading="lazy" width="1747" height="846" data-i18n-attr="alt|tiempo.20@alt"><figcaption data-i18n="tiempo.21">Canal 13. Izquierda: para predecir velocidad. Derecha: para predecir posición.</figcaption></figure>
   <p data-i18n="tiempo.22">Para <b>velocidad</b>, el peso de hace 220-300 ms es positivo y el de hace 100 ms es negativo: el modelo calcula <i>actividad antigua menos actividad reciente</i>. Restar un valor de antes y uno de ahora es justo una <b>derivada</b>. Para <b>posición</b>, todos los pesos tienen el mismo signo: el modelo <b>suma</b> la actividad de los últimos 300 ms, que es una <b>integral</b>. El signo concreto no importa (depende de cómo esté orientada la PC); lo que importa es “cambia de signo” contra “no cambia”.</p>
+  <div class="mathbox" data-i18n="math.tiempo"><p class="mb-title">En fórmulas</p>
+<p><b>Correlación con retardo.</b></p>
+<div class="md">r(\tau) = \frac{\sum_t \big(x(t-\tau) - \bar x\big)\big(y(t) - \bar y\big)}{\sqrt{\sum_t \big(x(t-\tau)-\bar x\big)^2 \, \sum_t \big(y(t)-\bar y\big)^2}}, \qquad \tau^{*} = \arg\max_\tau\, r(\tau) \approx 60\ \text{ms}</div>
+<p><b>Regresión con retardos (mTRF).</b> Cada salida es una suma ponderada de los 16 canales en varios instantes pasados. Los pesos salen de la regresión ridge:</p>
+<div class="md">\hat y(t) = \sum_{c=1}^{16} \sum_{\ell} w_{c,\ell}\; x_c(t - \ell\,\Delta t), \qquad \mathbf W = \left(\mathbf X^{\top}\mathbf X + \lambda \mathbf I\right)^{-1}\mathbf X^{\top}\mathbf Y</div>
+<p>El término <span class="m">\lambda \mathbf I</span> evita pesos enormes cuando los canales se parecen mucho entre sí. Para leer los pesos de un canal: si <span class="m">w_{\ell}</span> vale <span class="m">+1</span> hace 250 ms y <span class="m">-1</span> hace 100 ms, el modelo calcula <span class="m">x(t-250) - x(t-100)</span>, una diferencia, o sea una derivada. Si todos los <span class="m">w_\ell</span> tienen el mismo signo, es una suma: una integral.</p>
+<p><b>Coherencia.</b> Es una correlación al cuadrado calculada frecuencia a frecuencia, a partir de los espectros cruzados <span class="m">S_{xy}(f)</span>:</p>
+<div class="md">C_{xy}(f) = \frac{|S_{xy}(f)|^2}{S_{xx}(f)\, S_{yy}(f)} \in [0,1], \qquad \gamma^2_{y\mid\mathbf x}(f) = \frac{\mathbf S_{y\mathbf x}\, \mathbf S_{\mathbf x\mathbf x}^{-1}\, \mathbf S_{\mathbf x y}}{S_{yy}}</div>
+<p>La segunda es la <i>coherencia múltiple</i>: lo mismo pero con los 16 canales a la vez. Derivar <span class="m">y</span> multiplica su transformada por <span class="m">i2\pi f</span>, y ese factor aparece arriba y abajo y se cancela. Por eso la coherencia con la posición y con la velocidad sale igual.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=The+multivariate+temporal+response+function+mTRF+toolbox" target="_blank" rel="noopener">Crosse et al. (2016), mTRF</a> · <a href="https://en.wikipedia.org/wiki/Ridge_regression" target="_blank" rel="noopener">regresión ridge</a> · <a href="https://en.wikipedia.org/wiki/Coherence_(signal_processing)" target="_blank" rel="noopener">coherencia</a></p></div>
   <div class="quiz" data-answer="0">
     <p class="q" data-i18n="tiempo.23">¿Por qué la correlación es máxima con la EMG desplazada ~60 ms?</p>
     <div class="opts">
@@ -396,6 +461,18 @@ ul.reads li { margin-bottom: 8px; }
       <p class="note" id="handTxt">PC1: abrir y cerrar los cuatro dedos a la vez. Es la “sinergia” clásica.</p>
     </div>
   </div>
+  <div class="mathbox" data-i18n="math.pca"><p class="mb-title">En fórmulas</p>
+<p><b>Paso a paso.</b> Con <span class="m">T</span> instantes y 20 ángulos, apilamos la matriz <span class="m">\mathbf X \in \mathbb R^{T\times 20}</span> y restamos a cada columna su media <span class="m">\boldsymbol\mu</span>.</p>
+<ol>
+<li>Covarianza: <span class="m">\mathbf C = \frac{1}{T-1}\mathbf X^{\top}\mathbf X</span>, una matriz 20 × 20 que dice cuánto varía cada par de articulaciones a la vez.</li>
+<li>Autovectores y autovalores: <span class="m">\mathbf C\,\mathbf v_k = \lambda_k \mathbf v_k</span>, ordenados <span class="m">\lambda_1 \ge \lambda_2 \ge \dots</span> Cada <span class="m">\mathbf v_k</span> es una dirección (20 pesos) y <span class="m">\lambda_k</span> es la varianza en esa dirección.</li>
+<li>Puntuación de la PC <span class="m">k</span> en el instante <span class="m">t</span>: <span class="m">z_k(t) = \mathbf v_k^{\top}\big(\mathbf x(t) - \boldsymbol\mu\big) = \sum_{j=1}^{20} v_{kj}\,\big(\theta_j(t) - \mu_j\big)</span>. <b>Un número.</b></li>
+<li>Reconstruir con <span class="m">K</span> PCs: <span class="m">\hat{\mathbf x}(t) = \boldsymbol\mu + \sum_{k=1}^{K} z_k(t)\,\mathbf v_k</span>. Lo que se pierde es la varianza de las PCs descartadas, <span class="m">\sum_{k>K}\lambda_k</span>.</li>
+</ol>
+<p><b>El caso de dos articulaciones, con números.</b> Si las dos tienen la misma varianza <span class="m">\sigma^2</span> y correlación <span class="m">r</span>, los autovalores son <span class="m">\sigma^2(1+r)</span> y <span class="m">\sigma^2(1-r)</span>, así que la PC1 captura</p>
+<div class="md">\frac{\lambda_1}{\lambda_1+\lambda_2} = \frac{1+r}{2}</div>
+<p>Para los nudillos del corazón y el anular, <span class="m">r \approx 0{,}94</span>: eso da ~97 %, lo que muestra el laboratorio. El botón “buscar la mejor” usa la dirección óptima en 2D, <span class="m">\varphi^{*} = \tfrac12\,\operatorname{atan2}\!\left(2 s_{12},\; s_{11} - s_{22}\right)</span>, con <span class="m">s_{11}, s_{22}</span> las varianzas y <span class="m">s_{12}</span> la covarianza.</p>
+<p class="mb-links">Para profundizar: <a href="https://setosa.io/ev/principal-component-analysis/" target="_blank" rel="noopener">Setosa, PCA visual</a> · <a href="https://arxiv.org/abs/1404.1100" target="_blank" rel="noopener">Shlens, “A tutorial on PCA”</a> · <a href="https://en.wikipedia.org/wiki/Principal_component_analysis" target="_blank" rel="noopener">Wikipedia</a></p></div>
   <div class="quiz" data-answer="1">
     <p class="q" data-i18n="pca.20">En un instante concreto, ¿qué es “la PC1” de la postura?</p>
     <div class="opts">
@@ -435,6 +512,14 @@ ul.reads li { margin-bottom: 8px; }
     <tr><td data-i18n="santello.28">dimensión “efectiva” (participation ratio)</td><td class="n" data-i18n="santello.29">3,2</td></tr>
     <tr><td data-i18n="santello.30">PCs que el modelo de regresión de Meta predice con R² &gt; 0,1</td><td class="n" data-i18n="santello.31">4</td></tr>
   </tbody></table></div>
+  <div class="mathbox" data-i18n="math.santello"><p class="mb-title">En fórmulas</p>
+<p><b>Varianza acumulada</b> con <span class="m">k</span> componentes y <b>dimensión efectiva</b> (participation ratio):</p>
+<div class="md">F(k) = \frac{\sum_{i=1}^{k}\lambda_i}{\sum_{i}\lambda_i}, \qquad \mathrm{PR} = \frac{\left(\sum_i \lambda_i\right)^2}{\sum_i \lambda_i^2}</div>
+<p>El PR vale 1 si toda la varianza está en una dirección, y <span class="m">n</span> si está repartida por igual entre <span class="m">n</span>. Ejemplos: <span class="m">\lambda = (1, 1, 0, \dots)</span> da 2; los porcentajes de nuestra pose, <span class="m">(0{,}53;\ 0{,}12;\ 0{,}07;\ \dots)</span>, dan ~3,2. Santello encontró <span class="m">F(2) > 0{,}8</span>; nosotros tenemos <span class="m">F(2) = 0{,}66</span> con todo el movimiento y <span class="m">0{,}80</span> en sus condiciones.</p>
+<p><b>Dimensión intrínseca (TwoNN).</b> Para cada punto, <span class="m">\mu_i = r_2/r_1</span> es el cociente de las distancias a sus dos vecinos más cercanos. Si los datos viven en una superficie de dimensión <span class="m">d</span>, <span class="m">\mu</span> sigue una ley de Pareto de exponente <span class="m">d</span>, y se estima</p>
+<div class="md">\hat d = \frac{N}{\sum_{i=1}^{N} \ln \mu_i}</div>
+<p>No exige que la superficie sea plana (PCA sí). Si saliera mucho menor que el número de PCs, habría una superficie curva escondida que un autoencoder podría aprovechar. Sale parecido (~8-9), así que no la hay.</p>
+<p class="mb-links">Para profundizar: <a href="https://www.jneurosci.org/content/18/23/10105" target="_blank" rel="noopener">Santello et al. (1998)</a> · <a href="https://scholar.google.com/scholar?q=Facco+2017+Estimating+the+intrinsic+dimension+of+datasets+by+a+minimal+neighborhood+information" target="_blank" rel="noopener">Facco et al. (2017), TwoNN</a> · <a href="https://scholar.google.com/scholar?q=Gao+Ganguli+2015+On+simplicity+and+complexity+in+the+brave+new+world+of+large-scale+neuroscience" target="_blank" rel="noopener">Gao y Ganguli (2015), dimensión en neurociencia</a></p></div>
   <div class="quiz" data-answer="2">
     <p class="q" data-i18n="santello.32">¿Por qué en emg2pose hacen falta más componentes que en Santello?</p>
     <div class="opts">
@@ -474,6 +559,14 @@ ul.reads li { margin-bottom: 8px; }
     <svg class="chart" id="pcSvg" viewBox="0 0 760 280" role="img" aria-label="R² por componente principal para tracking y regresión" data-i18n-attr="aria-label|r2.21@aria-label"></svg>
   </div>
   <p data-i18n="r2.22"><b>“¿Quizás no hay mucho que reducir?”</b> Hay dos números distintos. Para <b>describir</b> la pose hacen falta ~8 dimensiones. Pero lo que el modelo <b>acierta</b> en una persona nueva es mucho menos: en regresión, la PC1 muy bien (0,79), otra PC grande a medias, un par muy flojo, y a partir de la PC10 R² negativo. Así que sí hay qué reducir: no la mano en sí, sino <b>las direcciones que la EMG no deja predecir</b>. Ahí el modelo solo mete error.</p>
+  <div class="mathbox" data-i18n="math.r2"><p class="mb-title">En fórmulas</p>
+<div class="md">R^2 = 1 - \frac{\sum_t \big(y_t - \hat y_t\big)^2}{\sum_t \big(y_t - \bar y\big)^2}</div>
+<p>El denominador es el error de predecir siempre la media <span class="m">\bar y</span>. Si tu error es igual, <span class="m">R^2 = 0</span>; si es mayor, <span class="m">R^2 \lt 0</span>, y no hay límite por abajo.</p>
+<p><b>R² por PC.</b> Pasamos verdad y predicción a coordenadas PCA, <span class="m">z_k = \mathbf v_k^{\top}(\mathbf y - \boldsymbol\mu)</span> y <span class="m">\hat z_k = \mathbf v_k^{\top}(\hat{\mathbf y} - \boldsymbol\mu)</span>, y calculamos <span class="m">R^2_k</span> con la misma fórmula.</p>
+<p><b>Una trampa que nos pasó.</b> El R² “juntando los 20 ángulos” (en grados) es una media de los R² por PC, ponderada por la varianza de cada PC:</p>
+<div class="md">R^2_{\text{total}} = \frac{\sum_k \lambda_k\, R^2_k}{\sum_k \lambda_k}</div>
+<p>Como la PC1 tiene el 53 % de la varianza, domina ese número: un decodificador que solo acierte la PC1 ya tiene un R² total decente. Por eso en <i>Getting Neurosciency</i> repetimos los análisis con todas las PCs pesando igual.</p>
+<p class="mb-links">Para profundizar: <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination" target="_blank" rel="noopener">R² en Wikipedia</a></p></div>
   <div class="quiz" data-answer="1">
     <p class="q" data-i18n="r2.23">El modelo tiene R² = −0,8 en la PC11. ¿Qué significa?</p>
     <div class="opts">
@@ -509,6 +602,12 @@ ul.reads li { margin-bottom: 8px; }
     <div class="readout" id="bnRead"></div>
   </div>
   <p data-i18n="gratis.19">En <b>regresión</b>, quedarse con 6-12 dimensiones <b>baja</b> el error (13,1° → 12,8°): las dimensiones que tiramos eran ruido. En <b>tracking</b> cuesta poco: +0,3° con k = 12, +1,1° con k = 8. Y fíjate: el error comprimido es mucho menor que “error del modelo + suelo”, porque lo que se tira son justo las direcciones en las que el modelo ya se equivocaba.</p>
+  <div class="mathbox" data-i18n="math.gratis"><p class="mb-title">En fórmulas</p>
+<p>Con <span class="m">\mathbf V_k</span> la matriz 20 × <span class="m">k</span> de las primeras PCs, el proyector <span class="m">\mathbf P_k = \mathbf V_k\mathbf V_k^{\top}</span> se queda con la parte de un vector que vive en esas <span class="m">k</span> direcciones:</p>
+<div class="md">\hat{\mathbf y}^{(k)} = \boldsymbol\mu + \mathbf P_k(\hat{\mathbf y} - \boldsymbol\mu)\ \ \text{(salida comprimida)}, \qquad \mathbf y^{(k)} = \boldsymbol\mu + \mathbf P_k(\mathbf y - \boldsymbol\mu)\ \ \text{(suelo)}</div>
+<p><b>Cuándo comprimir ayuda (exacto para el error cuadrático).</b> En cada PC descartada <span class="m">j \gt k</span>, el modelo completo comete el error <span class="m">\sum_t(\hat z_j - z_j)^2</span>. El comprimido predice la media (<span class="m">\hat z_j = 0</span>) y comete <span class="m">\sum_t z_j^2</span>. Con PCs centradas, descartar la PC <span class="m">j</span> mejora el error si y solo si</p>
+<div class="md">\sum_t (\hat z_j - z_j)^2 \;\gt\; \sum_t z_j^2 \quad\Longleftrightarrow\quad R^2_j \lt 0</div>
+<p>Es decir: <b>conviene tirar justo las PCs en las que el modelo tiene R² negativo</b> (capítulo 8). En regresión son casi todas a partir de la PC10, y por eso el error baja al comprimir. La métrica del benchmark es el error absoluto y no el cuadrático, pero la idea es la misma.</p></div>
   <div class="quiz" data-answer="0">
     <p class="q" data-i18n="gratis.20">Si al comprimir la salida a k = 8 el error no sube, ¿qué nos dice?</p>
     <div class="opts">
@@ -543,6 +642,14 @@ ul.reads li { margin-bottom: 8px; }
     <li data-i18n="tolerancia.13">Hacer un <b>test de no inferioridad</b>: en vez de demostrar “es mejor”, demostrar “no es peor que δ”, emparejando por persona en los 20 usuarios de test.</li>
   </ol>
   <p data-i18n="tolerancia.14"><b>¿Por qué k ∈ {4, 6, 8, 12}?</b> 4: donde la regresión ya iguala al modelo completo. 6-8: la zona del 90 % de la variación. 12: donde tracking queda dentro del 5 %. (La propuesta ya mencionaba 2, 4, 6, 8, 12, 16.) El ruido de las etiquetas de captura de movimiento es diminuto (~0,1°), así que no sirve para fijar δ.</p>
+  <div class="mathbox" data-i18n="math.tolerancia"><p class="mb-title">En fórmulas</p>
+<p><b>La regla.</b> Con <span class="m">E(k)</span> el error usando <span class="m">k</span> dimensiones y <span class="m">E_{\text{full}}</span> el del modelo directo:</p>
+<div class="md">k^{*} = \min\left\{\, k \;:\; E(k) \le (1+\delta)\, E_{\text{full}} \,\right\}</div>
+<p><b>Elegir δ con la variabilidad entre semillas.</b> Si al entrenar el modelo directo con varias semillas los errores tienen desviación típica <span class="m">s_{\text{seed}}</span>, un margen razonable es del orden de <span class="m">\delta\,E_{\text{full}} \approx 2\,s_{\text{seed}}</span>: diferencias menores no se distinguen del azar del entrenamiento.</p>
+<p><b>Test de no inferioridad, emparejado por persona.</b> Para cada usuario de test <span class="m">u</span>, sea <span class="m">d_u = E_u(k) - E_u(\text{full})</span>. Con <span class="m">n</span> usuarios, media <span class="m">\bar d</span> y desviación <span class="m">s_d</span>, el modelo comprimido es “no inferior” si el extremo superior del intervalo de confianza unilateral queda por debajo del margen <span class="m">m = \delta E_{\text{full}}</span>:</p>
+<div class="md">\bar d + t_{0.95,\,n-1}\, \frac{s_d}{\sqrt n} \;\lt\; m</div>
+<p>Ejemplo con números inventados: <span class="m">n = 20</span>, <span class="m">s_d = 0{,}5^\circ</span>, <span class="m">m = 0{,}5^\circ</span>. Como <span class="m">t_{0.95,19} \approx 1{,}73</span>, el segundo término vale <span class="m">1{,}73 \cdot 0{,}5/\sqrt{20} \approx 0{,}19^\circ</span>, así que pasa si <span class="m">\bar d \lt 0{,}31^\circ</span>.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=Lakens+2017+Equivalence+tests+a+practical+primer" target="_blank" rel="noopener">Lakens (2017), “Equivalence tests: a practical primer”</a> · <a href="https://en.wikipedia.org/wiki/Equivalence_test" target="_blank" rel="noopener">Wikipedia</a></p></div>
   <div class="quiz" data-answer="2">
     <p class="q" data-i18n="tolerancia.15">El modelo completo tiene 10° de error y δ = 5 %. ¿Qué k aceptas?</p>
     <div class="opts">
@@ -580,7 +687,14 @@ ul.reads li { margin-bottom: 8px; }
     <li data-i18n="usuarios.17">Comparar persona a persona: ¿el bottleneck tiene error igual o menor? ¿Se reduce el salto entre el error en entrenamiento y en gente nueva?</li>
   </ol>
   <p data-i18n="usuarios.18">Así que no es solo “ver si el error no sube”: la hipótesis del proyecto es que el bottleneck <b>mejora</b> (o al menos no empeora más de δ) en gente nueva, porque obliga al modelo a predecir lo que la EMG realmente contiene. Nuestro usuario del dataset mini es de validación: el modelo nunca lo vio, por eso sus números (9,2° y 13,0°) ya son de generalización.</p>
-</section>
+<div class="mathbox" data-i18n="math.usuarios"><p class="mb-title">En fórmulas</p>
+<p><b>Las dos métricas del benchmark</b>, para <span class="m">T</span> instantes y <span class="m">J = 20</span> ángulos, y para <span class="m">L</span> puntos de la mano obtenidos con la cinemática directa <span class="m">\mathrm{FK}</span> (de ángulos a posiciones 3D):</p>
+<div class="md">\mathrm{MAE} = \frac{1}{TJ}\sum_{t=1}^{T}\sum_{j=1}^{J} \big|\hat\theta_{tj} - \theta_{tj}\big|, \qquad \mathrm{LD} = \frac{1}{TL}\sum_{t}\sum_{l} \big\| \mathrm{FK}(\hat{\boldsymbol\theta}_t)_l - \mathrm{FK}(\boldsymbol\theta_t)_l \big\|_2</div>
+<p><b>Lo que comparamos.</b> Con <span class="m">\mathcal U_{\text{test}}</span> las personas nunca vistas, el error de generalización y el salto respecto a personas conocidas:</p>
+<div class="md">E_{\text{test}} = \frac{1}{|\mathcal U_{\text{test}}|}\sum_{u\in\mathcal U_{\text{test}}} \mathrm{MAE}_u, \qquad \text{salto} = E_{\text{test}} - E_{\text{train}}</div>
+<p>La hipótesis del proyecto en una línea: <span class="m">E_{\text{test}}(\text{bottleneck}, k) \le E_{\text{test}}(\text{directo})</span>, con un salto menor, comprobado persona a persona con el test del capítulo 10.</p>
+<p class="mb-links">Para profundizar: <a href="https://arxiv.org/abs/2412.02725" target="_blank" rel="noopener">Salter et al. (2024), emg2pose</a>, secciones de métricas y particiones.</p></div>
+  </section>
 
 <!-- 12 --------------------------------------------------------------- -->
 <section class="ch" id="metodos">
@@ -597,7 +711,14 @@ ul.reads li { margin-bottom: 8px; }
     <tr><td data-i18n="metodos.28">CEBRA / contrastivo (CPEP, KinEMbed)</td><td data-i18n="metodos.29">alinear el espacio de la EMG con el de la pose</td><td data-i18n="metodos.30">no</td><td data-i18n="metodos.31">sí</td></tr>
   </tbody></table></div>
   <p data-i18n="metodos.32">Recomendación: PCA (base), reduced-rank regression (lo más parecido a PCA pero guiado por la EMG; es “el subespacio decodificable” del capítulo 8 hecho método) y el autoencoder de la propuesta.</p>
-</section>
+<div class="mathbox" data-i18n="math.metodos"><p class="mb-title">En fórmulas</p>
+<div class="md">\textbf{PCA:}\ \max_{\mathbf V^{\top}\mathbf V = \mathbf I} \|\mathbf Y\mathbf V\|_F^2 \qquad \textbf{RRR:}\ \min_{\operatorname{rank}(\mathbf B)\le r} \|\mathbf Y - \mathbf X\mathbf B\|_F^2 \qquad \textbf{AE:}\ \min_{f,g}\ \|\mathbf y - g(f(\mathbf y))\|^2</div>
+<p>PCA solo mira la pose <span class="m">\mathbf Y</span>. La <b>regresión de rango reducido</b> mira la EMG <span class="m">\mathbf X</span> y la pose a la vez: busca la mejor matriz EMG → pose que solo pueda pasar por <span class="m">r</span> dimensiones. Tiene solución cerrada: se ajusta la regresión normal <span class="m">\hat{\mathbf B}</span> y se proyectan sus predicciones sobre sus <span class="m">r</span> direcciones principales, <span class="m">\mathbf B_r = \hat{\mathbf B}\,\mathbf V_r\mathbf V_r^{\top}</span>, con <span class="m">\mathbf V_r</span> de la SVD de <span class="m">\mathbf X\hat{\mathbf B}</span>. El autoencoder sustituye las matrices por redes: <span class="m">f</span> comprime y <span class="m">g</span> descomprime.</p>
+<p><b>Por qué la velocidad es fácil con PCA y difícil con un autoencoder</b> (regla de la cadena):</p>
+<div class="md">\text{PCA: } \mathbf z = \mathbf V^{\top}(\mathbf y - \boldsymbol\mu) \;\Rightarrow\; \dot{\mathbf z} = \mathbf V^{\top}\dot{\mathbf y} \qquad\qquad \text{AE: } \mathbf z = f(\mathbf y) \;\Rightarrow\; \dot{\mathbf z} = \mathbf J_f(\mathbf y)\,\dot{\mathbf y}</div>
+<p>Con PCA la matriz que convierte velocidades es siempre la misma; con el autoencoder, la jacobiana <span class="m">\mathbf J_f</span> cambia según la postura <span class="m">\mathbf y</span>.</p>
+<p class="mb-links">Para profundizar: <a href="https://scholar.google.com/scholar?q=Izenman+1975+Reduced-rank+regression+for+the+multivariate+linear+model" target="_blank" rel="noopener">Izenman (1975), regresión de rango reducido</a> · <a href="https://scholar.google.com/scholar?q=Semedo+2019+Cortical+areas+interact+through+a+communication+subspace" target="_blank" rel="noopener">Semedo et al. (2019)</a></p></div>
+  </section>
 
 <!-- 13 --------------------------------------------------------------- -->
 <section class="ch" id="faq">
@@ -637,6 +758,7 @@ ul.reads li { margin-bottom: 8px; }
 </div>
 <div class="tip" id="tip" hidden=""></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script>
 "use strict";
 // ---------------------------------------------------------------- i18n
@@ -1285,6 +1407,46 @@ const FLOOR = [12.60, 11.10, 10.18, 9.34, 8.62, 8.04, 6.49, 4.98, 4.07, 1.98, 0.
   }
   draw(); redrawers.push(draw);
 })();
+
+// ---------------------------------------------------------------- math (KaTeX -> native MathML, no fonts needed)
+// Chrome's MathML ignores mathvariant, so map bold / bold-italic / double-struck letters to Unicode math letters.
+function fixVariants(root) {
+  const conv = (ch, v) => {
+    const c = ch.codePointAt(0);
+    if (v === "double-struck") return ch === "R" ? "ℝ" : ch;
+    const up = c >= 65 && c <= 90, lo = c >= 97 && c <= 122, GU = c >= 0x391 && c <= 0x3A9, gl = c >= 0x3B1 && c <= 0x3C9;
+    if (v === "bold") { if (up) return String.fromCodePoint(0x1D400 + c - 65); if (lo) return String.fromCodePoint(0x1D41A + c - 97); if (GU) return String.fromCodePoint(0x1D6A8 + c - 0x391); if (gl) return String.fromCodePoint(0x1D6C2 + c - 0x3B1); }
+    if (v === "bold-italic") { if (up) return String.fromCodePoint(0x1D468 + c - 65); if (lo) return String.fromCodePoint(0x1D482 + c - 97); if (GU) return String.fromCodePoint(0x1D71C + c - 0x391); if (gl) return String.fromCodePoint(0x1D736 + c - 0x3B1); }
+    return ch;
+  };
+  root.querySelectorAll("[mathvariant]").forEach(n => {
+    const v = n.getAttribute("mathvariant");
+    if (!["bold", "bold-italic", "double-struck"].includes(v) || n.children.length) return;
+    n.textContent = Array.from(n.textContent).map(ch => conv(ch, v)).join("");
+    n.setAttribute("mathvariant", "normal");
+  });
+}
+function texRender(el) {
+  const tex = el.dataset.tex || el.textContent;
+  el.dataset.tex = tex;
+  const disp = el.classList.contains("md");
+  const go = t => { katex.render(t, el, { output: "mathml", displayMode: disp, throwOnError: false }); fixVariants(el); };
+  try {
+    go(tex);
+    // a multi-part display formula that does not fit: stack its parts on separate lines
+    if (disp && el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2 && tex.includes("\\qquad"))
+      go("\\begin{gathered}" + tex.replace(/,?\s*\\qquad\s*/g, " \\\\ ") + "\\end{gathered}");
+  } catch (e) {}
+}
+function renderMath() {
+  if (!window.katex) return;
+  $$(".m, .md").forEach(el => { if (!el.querySelector("math")) texRender(el); });
+}
+function refitMath() {
+  if (!window.katex) return;
+  $$(".md").forEach(el => { if (el.dataset.tex && el.offsetParent) texRender(el); });
+}
+renderMath(); langHooks.push(renderMath); redrawers.push(refitMath);
 
 if (window.__initLang) window.__initLang();
 </script>
