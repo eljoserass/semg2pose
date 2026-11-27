@@ -81,6 +81,17 @@ the notebooks: `from semg2pose.data import load_session, JOINT_NAMES, ...`.
 | `motor_units_zoom.ipynb` | Raw EMG, electrode geometry, motor-unit simulation, spectral bands | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/motor_units_zoom.ipynb) |
 | `emg_angle_correlation.ipynb` | Channel × joint correlations, EMG→movement lag, ridge/CCA decoding | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/emg_angle_correlation.ipynb) |
 | `joint_space_manifold.ipynb` | Range of motion, PCA eigen-postures, intrinsic dimension, UMAP, PCA vs autoencoder | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/joint_space_manifold.ipynb) |
+| `pipeline_overview.ipynb` | Shapes and preprocessing end to end, the pretrained vemg2pose layer by layer, metrics, where the bottleneck goes | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/pipeline_overview.ipynb) |
+| `compression_tolerance.ipynb` | Santello 1998 replication, dimension ladder, per-PC decodability of the pretrained model, post-hoc bottleneck, tolerance rules | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/compression_tolerance.ipynb) |
+| `spectral_spatial_fingerprints.ipynb` | Band × electrode maps per stage and per finger movement, movement classification, first-layer filters of the network | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/spectral_spatial_fingerprints.ipynb) |
+| `emg_kinematics_encoding.ipynb` | Position vs velocity vs acceleration (encoding models), lagged decoding (mTRF), multiple coherence, muscle synergies | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/emg_kinematics_encoding.ipynb) |
+| `neural_synergies.ipynb` | Exploratory: is the low-dimensional pose structure already in the muscle signal? Crosstalk-controlled EMG dimension, reduced-rank (communication subspace) decoding, decodable vs PCA subspaces, muscle synergies across tasks and hands, validation plan | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/neural_synergies.ipynb) |
+| `cross_user_invariance.ipynb` | Exploratory, 12 users from the full dataset (download with `scripts/partial_dataset/`): pose subspaces are shared across people beyond structured nulls, EMG subspaces are person-specific; leave-one-user-out pose bases | needs local data |
+| `intermuscular_coherence.ipynb` | Exploratory: coherence of rectified EMG within vs between synergy sectors at matched distance, crosstalk controls | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/intermuscular_coherence.ipynb) |
+| `network_internals.ipynb` | Exploratory: dimensionality, readout and alignment of the pretrained vemg2pose encoder features (treated as a neural population) | [Open in Colab](https://colab.research.google.com/github/eljoserass/semg2pose/blob/main/notebooks/network_internals.ipynb) |
+
+`pipeline_overview`, `compression_tolerance` and `network_internals` also download Meta's pretrained checkpoints (~250 MB) to
+`~/emg2pose_model_checkpoints` (helpers in `src/semg2pose/model.py`).
 
 ## License
 
